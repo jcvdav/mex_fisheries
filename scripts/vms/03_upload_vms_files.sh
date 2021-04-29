@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 # Upload all local csv files to GCS Bucket
 gsutil cp "$PROJECT_PATH"/processed_data/MEX_VMS/*.csv gs://mex_fisheries/MEX_VMS
 
@@ -19,3 +19,4 @@ bq load \
 emlab-gcp:mex_fisheries.mex_vms \
 gs://mex_fisheries/MEX_VMS/MEX_VMS_*.csv
 
+date >> vms.log

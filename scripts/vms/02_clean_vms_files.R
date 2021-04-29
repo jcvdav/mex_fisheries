@@ -92,7 +92,7 @@ plan(sequential)
 
 
 
-
+system("date >> scripts/vms/csv.log")
 
 
 

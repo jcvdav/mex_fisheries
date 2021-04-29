@@ -39,7 +39,7 @@ new_file <- str_replace_all(paths, "xlsx", "csv")
 
 walk2(paths, new_file, rw)
 
-
+system("date >> scripts/vms/xlsx.log")
 
 
 
