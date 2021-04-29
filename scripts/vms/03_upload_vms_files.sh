@@ -17,7 +17,7 @@ bq load \
 --skip_leading_rows=1 \
 --replace \
 emlab-gcp:mex_fisheries.mex_vms \
-gs://mex_fisheries/MEX_VMS/MEX_VMS_*.csv
+gs://mex_fisheries/MEX_VMS/MXN_VMS_*.csv
 
 # Save breadcrumb
 date >> scripts/vms/upload.log
