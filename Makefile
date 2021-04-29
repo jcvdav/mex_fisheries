@@ -8,7 +8,7 @@ upload.log: scripts/vms/03_upload_vms_files.sh scripts/vms/clean.log
 	cd $(<D);sh $(<F)
 
 # Status of clean data
-scripts/vms/clsan.log: scripts/vms/02_clean_vms_files.R scripts/vms/csv.log
+scripts/vms/clean.log: scripts/vms/02_clean_vms_files.R scripts/vms/csv.log
 	cd $(<D);Rscript $(<F)
 
 # Status of csv data (between raw and clean)
