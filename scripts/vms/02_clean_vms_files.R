@@ -92,8 +92,7 @@ plan(sequential)
 
 
 
-system("date >> scripts/vms/csv.log")
-
+system("date >> scripts/vms/clean.log")
 
 
 

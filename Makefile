@@ -4,15 +4,15 @@
 # I use a series of breadcrumbs (ending in .log) that keep track of file status
 
 # status of data on GBC and GCS
-vms.log: scripts/vms/03_upload_vms_files.sh scripts/vms/csv.log
+upload.log: scripts/vms/03_upload_vms_files.sh scripts/vms/clean.log
 	cd $(<D);sh $(<F)
 
 # Status of clean data
-scripts/vms/csv.log: scripts/vms/02_clean_vms_files.R scripts/vms/xlsx.log
+scripts/vms/clsan.log: scripts/vms/02_clean_vms_files.R scripts/vms/csv.log
 	cd $(<D);Rscript $(<F)
 
 # Status of csv data (between raw and clean)
-scripts/vms/xlsx.log: scripts/vms/01_convert_excel_to_csv.R scripts/vms/raw.log
+scripts/vms/csv.log: scripts/vms/01_convert_excel_to_csv.R scripts/vms/raw.log
 	cd $(<D);Rscript $(<F)
 
 # draw makefile dag

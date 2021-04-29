@@ -19,4 +19,6 @@ bq load \
 emlab-gcp:mex_fisheries.mex_vms \
 gs://mex_fisheries/MEX_VMS/MEX_VMS_*.csv
 
-date >> vms.log
+# Save breadcrumb
+date >> scripts/vms/upload.log
+
