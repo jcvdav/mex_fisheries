@@ -5,7 +5,7 @@ gsutil cp "$PROJECT_PATH"/processed_data/MEX_VMS/*.csv gs://mex_fisheries/MEX_VM
 # Create a partitioned table in Big Query
 bq rm -f -t emlab-gcp:mex_fisheries.mex_vms
 bq mk --table \
---schema name:STRING,rnpa:STRING,port:STRING,economic_unit:STRING,datetime:DATETIME,lat:FLOAT,lon:FLOAT,speed:NUMERIC,course:INTEGER,year:INTEGER,month:INTEGER \
+--schema name:STRING,vessel_rnpa:STRING,port:STRING,economic_unit:STRING,datetime:DATETIME,lat:FLOAT,lon:FLOAT,speed:NUMERIC,course:INTEGER,year:INTEGER,month:INTEGER \
 --time_partitioning_field datetime \
 --time_partitioning_type YEAR \
 --description "Mexican VMS data, with some caveats" \
@@ -17,7 +17,7 @@ bq load \
 --skip_leading_rows=1 \
 --replace \
 emlab-gcp:mex_fisheries.mex_vms \
-gs://mex_fisheries/MEX_VMS/MXN_VMS_*.csv
+gs://mex_fisheries/MEX_VMS/MXN_VMS*.csv
 
 # Save breadcrumb
 date >> scripts/vms/upload.log
