@@ -24,25 +24,26 @@ str_fix <- function(x) {
 
 # Design speed function
 design_speed <- function(engine_power_hp) {
-  engine_power_kwh <-
-    engine_power_hp / 1.34102                             # Convert to kwh
+  engine_power_kwh <- (engine_power_hp / 1.34102)                           # Convert to kwh
   10.4818 + (1.2e-3 * engine_power_kwh) - (3.84e-8 * engine_power_kwh ^ 2)  # Calculate design speed
 }
 
 ## Load data  ###############################################################################################################################################
 # Maximum daily liters for each engine size and fuel type
 mdl_raw <-
-  read_csv(file.path(project_path, "raw_data", "maximum_daily_liters.csv"))
+  read_csv(file.path(project_path, "raw_data", "maximum_daily_liters.csv")) %>% 
+  filter(fuel_type == "diesel")
 
 # The data are in an excel file, which contains three worksheets
 excel_data_file <- file.path(project_path,"raw_data","ANEXO-DGPPE-147220","ANEXO SISI 147220 - EmbarcacionesMayores.xlsx")
 
 # List of assets are on sheet 1
-assets_raw <- read_excel(
+ls_assets_raw <- read_excel(
   path = excel_data_file,
+  skip = 6,
   sheet = 1,
-  col_types = c("skip", "text", "text", "numeric", "text", "numeric", "text", "numeric", "text", "text",         # Ah, the joy of specifying column types
-                "text", "text", "text", "text", "text", "text", "numeric", "text", "numeric", "numeric",
+  col_types = c("skip", "text", "text", "text", "text", "text", "text", "text", "text", "text",         # Ah, the joy of specifying column types
+                "text", "text", "text", "text", "text", "text", "text", "text", "numeric", "numeric",
                 "numeric", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric",
                 "numeric", "numeric", "numeric", "numeric", "numeric", "text", "text", "text", "text"))
 
@@ -64,17 +65,16 @@ engine_power_bins <- c(0, unique(mdl_raw$engine_power_hp))                      
 # Vessel engines
 vessel_engines <- vessel_engines_ls_raw %>%
   clean_names() %>%                                                                      # Clean column names
-  filter(principal == "SI") %>%                                                          # Keep only main engines
   rename(                                                                                # Start renaming columns we'll keep
     vessel_rnpa = rnpa_emb_mayor,
     brand = marca,
     model = modelo,
     serial_number = serie,
-    engine_power_hp = potencia) %>%
-  # mutate_at(vars(brand, model), str_fix) %>%                                             # Fix all string variables
+    engine_power_hp = potencia,
+    main_engine = principal) %>%
+  mutate(main_engine = main_engine == "SI") %>% 
+  mutate_at(vars(brand, model), str_fix) %>%                                             # Fix all string variables
   group_by(vessel_rnpa) %>%                                                              # Group by vessel and engine type
-  summarize(engine_power_hp = sum(engine_power_hp, na.rm = T)) %>%                       # Sum across engine types for each vessel
-  ungroup() %>% 
   mutate(
     engine_power_bin_hp = map_dbl(engine_power_hp,                                       # Find the matching bin from the regulation
                                   ~ {max(engine_power_bins[engine_power_bins <= .x])}),
@@ -84,15 +84,14 @@ vessel_engines <- vessel_engines_ls_raw %>%
     vessel_rnpa,
     engine_power_hp,
     engine_power_bin_hp,
-    design_speed_kt#,
-    # -c(serial_number, brand, model)                                                      # Remove serial number, brand, and model
+    design_speed_kt
   ) %>%
   distinct()
 
 # Clean assets
 plan("multisession")                   # It's faster to run in parallel
 
-assets <- assets_raw %>%
+ls_assets <- ls_assets_raw %>%
   clean_names() %>%                   # Clean column names
   rename(                             # Start renming columns we'll keep
     eu_rnpa = rnpa_8,
@@ -148,7 +147,7 @@ assets <- assets_raw %>%
       str_detect(target_species, "CAMARÓN") & target_species != "CAMARÓN" ~ "shrimp plus", # Matching shrimp and anything else is shrimp plus
       target_species == "CAMARÓN" ~ "shrimp",                                              # Anything mtching exactly shrimp is shrimp
       T ~ "any"),                                                                          # Anything left is any fishery
-    vessel_name = furrr::future_map_chr(vessel_name, normalize_shipname),
+    # vessel_name = furrr::future_map_chr(vessel_name, normalize_shipname),
     sfc_gr_kwh = case_when(
       vessel_length_m < 12 ~ 240,                                                          # Vessels smaller than 12 m have an SFC of 240 gr / kWH
       between(vessel_length_m, 12, 24) ~ 220,                                              # Vessels between 12 and 24 have an SFC of 220 gr / kWH
@@ -158,16 +157,17 @@ assets <- assets_raw %>%
 plan("sequential")
 
 ## Combine tables  ###############################################################################################################################################
-vessel_registry <- assets %>%                            # Take the assets table
+ls_vessel_registry <- ls_assets %>%                            # Take the assets table
   left_join(vessel_engines, by = "vessel_rnpa") %>%      # And add its engine info
-  drop_na(engine_power_hp)                               # Drop vessels for which we don't have engine info
+  drop_na(engine_power_hp) %>%                           # Drop vessels for which we don't have engine info
+  filter(between(vessel_length_m, 10, 100))
 
 
 ## Export data  ###############################################################################################################################################
 
 # Save csv for gogole cloud bucket
-write.csv(x = vessel_registry,
-          file = here("data", "vessel_registry.csv"),
+write.csv(x = ls_vessel_registry,
+          file = file.path(project_path, "processed_data", "MEX_VESSEL_REGISTRY", "large_scale_vessel_registry.csv"),
           row.names = F)
 
 # END OF SCRIPT ###############################################################################################################################################
