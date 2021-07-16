@@ -135,20 +135,65 @@ ls_assets <- ls_assets_raw %>%
       vessel_length_m > 24 ~ 180)) %>%                                                     # Vessels larger than 24 m have an SFC of 180 gr / kWH
   drop_na(eu_rnpa, vessel_rnpa)
 
-plan("sequential")
+# plan("sequential")
 
 ## Combine tables  ###############################################################################################################################################
-ls_vessel_registry <- ls_assets %>%                            # Take the assets table
+ls_vessel_registry <- ls_assets %>%                      # Take the assets table
   left_join(vessel_engines, by = "vessel_rnpa") %>%      # And add its engine info
-  drop_na(engine_power_hp) %>%                           # Drop vessels for which we don't have engine info
-  filter(between(vessel_length_m, 10, 100))
+  filter(between(vessel_length_m, 10.5, 100)) %>% 
+  mutate(fuel_type = "Diesel",
+         fleet = "large scale")
+
+engine_power_model <- lm(log(engine_power_hp) ~ log(vessel_length_m) + target_species, data = ls_vessel_registry)
+
+ls_vessel_registry_clean <- ls_vessel_registry  %>% 
+  mutate(imputed_engine_power = is.na(engine_power_hp),
+         new_hp = exp(predict(engine_power_model, newdata = .)),
+         engine_power_hp = coalesce(engine_power_hp, new_hp),
+         design_speed_kt = design_speed(engine_power_hp)) %>%                             # Calculate the engine's design speed
+  select(-new_hp) %>%
+  group_by(vessel_rnpa) %>%                                                              # Group by vessel and engine type
+  mutate(
+    engine_power_bin_hp = map_dbl(engine_power_hp,                                       # Find the matching bin from the regulation
+                                  ~ {max(engine_power_bins[engine_power_bins <= .x])})
+  ) %>% 
+  ungroup() %>% 
+  select(
+    eu_rnpa,
+    economic_unit,
+    vessel_rnpa,
+    vessel_name,
+    owner_rnpa,
+    owner_name,
+    hull_identifier,
+    target_species,
+    home_port,
+    construction_year,
+    hull_material,
+    preservation_system,
+    gear_type,
+    detection_gear,
+    contains("vessel_"),
+    contains("_num"),
+    sfc_gr_kwh,
+    engine_power_hp,
+    imputed_engine_power,
+    engine_power_bin_hp,
+    design_speed_kt,
+    brand,
+    model,
+    fuel_type,
+    fleet)
+  
 
 
 ## Export data  ###############################################################################################################################################
 
 # Save csv for gogole cloud bucket
-write.csv(x = ls_vessel_registry,
+write.csv(x = ls_vessel_registry_clean,
           file = file.path(project_path, "processed_data", "MEX_VESSEL_REGISTRY", "large_scale_vessel_registry.csv"),
           row.names = F)
+
+system("date >> scripts/vessel_registry/ls.log")
 
 # END OF SCRIPT ###############################################################################################################################################
