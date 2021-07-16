@@ -12,22 +12,6 @@ library(readxl)
 library(furrr)
 library(tidyverse)
 
-## Define functions we'll use
-# String-fixing function
-str_fix <- function(x) {
-  x <- str_to_upper(x)        # String to upper
-  x <-
-    str_trim(x)            # Trim leading and trailing whites paces
-  x <- str_squish(x)          # Squish repeated white spaces
-  return(x)                   # Return clean string
-}
-
-# Design speed function
-design_speed <- function(engine_power_hp) {
-  engine_power_kwh <- (engine_power_hp / 1.34102)                           # Convert to kwh
-  10.4818 + (1.2e-3 * engine_power_kwh) - (3.84e-8 * engine_power_kwh ^ 2)  # Calculate design speed
-}
-
 ## Load data  ###############################################################################################################################################
 # Maximum daily liters for each engine size and fuel type
 mdl_raw <-
@@ -66,7 +50,7 @@ engine_power_bins_gasoline <- c(0, unique(mdl_gasoline$engine_power_hp))        
 # Vessel engines
 ss_vessel_registry <- ss_assets_raw %>%
   clean_names() %>%                                                                      # Clean column names
-  filter(estatus == "ACTIVO") %>%
+  # filter(estatus == "ACTIVO") %>%
   rename(                                                                                # Start renaming columns we'll keep
     eu_rnpa = rnpa_8,
     economic_unit = unidad_economica,
@@ -85,7 +69,11 @@ ss_vessel_registry <- ss_assets_raw %>%
     serial_number = serie,
     engine_power_hp = potencia) %>% 
   distinct() %>% 
+  mutate_at(vars(brand, model), str_fix) %>%                                                    # Fix all string variables for engines
   mutate(
+    fuel_type = case_when(fuel_type == "GASOLINA" ~ "Gasoline",
+                          fuel_type == "DIESEL" ~ "Diesel",
+                          T ~ NA_character_),
     engine_power_bin_diesel_hp = map_dbl(engine_power_hp,                                       # Find the matching bin from the regulation
                                          ~ {max(engine_power_bins_diesel[engine_power_bins_diesel <= .x])}),
     engine_power_bin_gasoline_hp = map_dbl(engine_power_hp,                                       # Find the matching bin from the regulation
@@ -93,7 +81,6 @@ ss_vessel_registry <- ss_assets_raw %>%
     engine_power_bin_hp = ifelse(fuel_type == "Diesel", engine_power_bin_diesel_hp, engine_power_bin_gasoline_hp),
     design_speed_kt = design_speed(engine_power_hp),                                              # Calculate the engine's design speed
     # vessel_name = furrr::future_map_chr(vessel_name, normalize_shipname),
-    vessel_rnpa = fix_rnpa(vessel_rnpa),
     sfc_gr_kwh = 240) %>%                                                     #
   filter(engine_power_hp > 0) %>% 
   drop_na(eu_rnpa, vessel_rnpa, engine_power_hp) %>% 
@@ -109,8 +96,14 @@ ss_vessel_registry <- ss_assets_raw %>%
     contains("vessel_"),
     engine_power_hp,
     engine_power_bin_hp,
-    design_speed_kt
-  )
+    design_speed_kt,
+    brand,
+    model,
+    fuel_type
+  ) %>% 
+  mutate(fleet = "small scale") %>%
+  drop_na(vessel_rnpa) %>% 
+  distinct()
 
 
 ## Export data  ###############################################################################################################################################
@@ -119,5 +112,7 @@ ss_vessel_registry <- ss_assets_raw %>%
 write.csv(x = ss_vessel_registry,
           file = file.path(project_path, "processed_data", "MEX_VESSEL_REGISTRY", "small_scale_vessel_registry.csv"),
           row.names = F)
+
+system("date >> scripts/vessel_registry/ss.log")
 
 # END OF SCRIPT ###############################################################################################################################################
