@@ -59,22 +59,18 @@ vessel_engines <- vessel_engines_ls_raw %>%
     main_engine = principal) %>%
   mutate(main_engine = main_engine == "SI") %>% 
   mutate_at(vars(brand, model), str_fix) %>%                                             # Fix all string variables
-  group_by(vessel_rnpa) %>%                                                              # Group by vessel and engine type
-  mutate(
-    engine_power_bin_hp = map_dbl(engine_power_hp,                                       # Find the matching bin from the regulation
-                                  ~ {max(engine_power_bins[engine_power_bins <= .x])}),
-    design_speed_kt = design_speed(engine_power_hp)                                      # Calculate the engine's design speed
-  ) %>% 
   select(
     vessel_rnpa,
     engine_power_hp,
-    engine_power_bin_hp,
-    design_speed_kt
+    brand,
+    model
   ) %>%
-  distinct()
+  drop_na(vessel_rnpa) %>% 
+  distinct() %>% 
+  mutate(engine_power_hp = ifelse(engine_power_hp < 15, NA_real_, engine_power_hp))
 
 # Clean assets
-plan("multisession")                   # It's faster to run in parallel
+# plan("multisession")                   # It's faster to run in parallel
 
 ls_assets <- ls_assets_raw %>%
   clean_names() %>%                   # Clean column names
@@ -104,7 +100,7 @@ ls_assets <- ls_assets_raw %>%
     vessel_gross_tonnage = cap_carga,
     detection_gear = equipo_deteccion
   ) %>%                                                    ### REVIEW SPECIES ASSIGNMENT (TO BETTER-MATCH DPC)
-  filter(estatus == "ACTIVO") %>%
+  # filter(estatus == "ACTIVO") %>%
   select(
     eu_rnpa,
     economic_unit,
