@@ -140,14 +140,11 @@ ls_assets <- ls_assets_raw %>%
   ) %>%
   distinct() %>%
   mutate(
-    target_species = case_when(
-      str_detect(target_species, "ATÚN") ~ "tuna",                                         # Partial tuna matches are tuna
-      str_detect(target_species, "SARDINA") ~ "sardine",                                   # Partial sardine matches that don't contain tuna are sardine
-      target_species == "CAMARÓN | CAMARÓN" ~ "shrimp",                                    # Double shrimp matches are shrimp
-      str_detect(target_species, "CAMARÓN") & target_species != "CAMARÓN" ~ "shrimp plus", # Matching shrimp and anything else is shrimp plus
-      target_species == "CAMARÓN" ~ "shrimp",                                              # Anything mtching exactly shrimp is shrimp
-      T ~ "any"),                                                                          # Anything left is any fishery
-    # vessel_name = furrr::future_map_chr(vessel_name, normalize_shipname),
+    tuna = 1 * str_detect(target_species, "ATÚN"),
+    sardine = 1 * str_detect(target_species, "SARDINE"),
+    shrimp = 1 * str_detect(target_species, "CAMARÓN"),
+    others = (tuna == 0 & sardine == 0 & shrimp == 0),
+    vessel_name = furrr::future_map_chr(vessel_name, normalize_shipname),
     sfc_gr_kwh = case_when(
       vessel_length_m < 12 ~ 240,                                                          # Vessels smaller than 12 m have an SFC of 240 gr / kWH
       between(vessel_length_m, 12, 24) ~ 220,                                              # Vessels between 12 and 24 have an SFC of 220 gr / kWH

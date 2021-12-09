@@ -1,6 +1,17 @@
+######################################################
+#title#
+######################################################
+# 
+# Purpose
+#
+######################################################
 
+# Packages
+library(here)
+library(data.table)
+library(tidyverse)
 
-files <- list.files(path = file.path(project_path, "processed_data", "MEX_VESSEL_REGISTRY"), pattern = "csv", full.names = T)
+files <- list.files(path = file.path(project_path, "processed_data", "MEX_VESSEL_REGISTRY"), pattern = "scale", full.names = T)
 
 vessel_registry <- map_dfr(files,
                            fread) %>% 
