@@ -121,13 +121,10 @@ ls_assets <- ls_assets_raw %>%
   ) %>%
   distinct() %>%
   mutate(
-    target_species = case_when(
-      str_detect(target_species, "ATÚN") ~ "tuna",                                         # Partial tuna matches are tuna
-      str_detect(target_species, "SARDINA") ~ "sardine",                                   # Partial sardine matches that don't contain tuna are sardine
-      target_species == "CAMARÓN | CAMARÓN" ~ "shrimp",                                    # Double shrimp matches are shrimp
-      str_detect(target_species, "CAMARÓN") & target_species != "CAMARÓN" ~ "shrimp plus", # Matching shrimp and anything else is shrimp plus
-      target_species == "CAMARÓN" ~ "shrimp",                                              # Anything mtching exactly shrimp is shrimp
-      T ~ "any"),                                                                          # Anything left is any fishery
+    tuna = 1 * str_detect(target_species, "ATÚN"),
+    sardine = 1 * str_detect(target_species, "SARDINA"),
+    shrimp = 1 * str_detect(target_species, "CAMARÓN"),
+    others = 1 * (tuna == 0 & sardine == 0 & shrimp == 0),
     # vessel_name = furrr::future_map_chr(vessel_name, normalize_shipname),
     sfc_gr_kwh = case_when(
       vessel_length_m < 12 ~ 240,                                                          # Vessels smaller than 12 m have an SFC of 240 gr / kWH
@@ -144,7 +141,7 @@ ls_vessel_registry <- ls_assets %>%                      # Take the assets table
   mutate(fuel_type = "Diesel",
          fleet = "large scale")
 
-engine_power_model <- lm(log(engine_power_hp) ~ log(vessel_length_m) + target_species, data = ls_vessel_registry)
+engine_power_model <- lm(log(engine_power_hp) ~ log(vessel_length_m) + shrimp + tuna + sardine + others, data = ls_vessel_registry)
 
 ls_vessel_registry_clean <- ls_vessel_registry  %>% 
   mutate(imputed_engine_power = is.na(engine_power_hp),
@@ -167,6 +164,10 @@ ls_vessel_registry_clean <- ls_vessel_registry  %>%
     owner_name,
     hull_identifier,
     target_species,
+    tuna,
+    sardine,
+    shrimp,
+    others,
     home_port,
     construction_year,
     hull_material,
