@@ -25,8 +25,7 @@ rw <- function(x, y){
                                    "numeric",
                                    "numeric"),
                      na = "NULL",
-                     col_names = c("name", "rnpa", "port", "economic_unit", "datetime", "lat", "lon", "speed", "course")) %>% 
-    mutate(datetime = as.character(datetime))
+                     col_names = c("name", "rnpa", "port", "economic_unit", "datetime", "lat", "lon", "speed", "course"))
   
   fwrite(x = data, file = y, na = "NULL")
 }

@@ -8,8 +8,6 @@ project_path <- paste0(sys_path,"Shared drives/emlab/projects/current-projects/m
 # Set it as an environmental variable
 Sys.setenv(PROJECT_PATH = "/Volumes/GoogleDrive/Shared\ drives/emlab/projects/current-projects/mex-fisheries")
 
-system("SET PROJECT_PATH")
-
 # Reset theme
 ggplot2::theme_set(startR::ggtheme_plot())
 
