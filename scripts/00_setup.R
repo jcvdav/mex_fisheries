@@ -12,8 +12,12 @@ data_path <- file.path(sys_path,"Shared drives/emlab/data")
 project_path <- file.path(sys_path,"Shared drives/emlab/projects/current-projects/mex-fisheries")
 subsidies_path <- file.path(sys_path,"Shared drives/emlab/projects/current-projects/mexican-subsidies")
 
+# Data paths
+data_sets <- "/Users/juancarlosvillasenorderbez/GitHub/data/data_sets"
+
 # Functions
 fix_rnpa <- function(rnpa, length = 8){
+  rnpa[is.na(rnpa)] <- "_"
   lengths <- stringr::str_length(rnpa)
   missing <- pmax(length - lengths, 0)
   zeroes <- purrr::map_chr(missing, ~paste(numeric(length = .x), collapse = ""))

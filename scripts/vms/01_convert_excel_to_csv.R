@@ -7,6 +7,7 @@
 ######################################################
 ## Set up
 # Load packages
+library(data.table)
 library(readxl)
 library(magrittr)
 library(tidyverse)
@@ -30,16 +31,15 @@ rw <- function(x, y){
   fwrite(x = data, file = y, na = "NULL")
 }
 
-paths <- list.files(path = file.path(project_path, "raw_data", "MEX_VMS"),
+paths <- list.files(path = file.path(data_sets, "mex_fisheries", "mex_vms", "raw"),
                     recursive = T,
                     pattern = "*.xlsx",
                     full.names = T)
+
 new_file <- str_replace_all(paths, "xlsx", "csv")
 
 walk2(paths, new_file, rw)
 
-system("date >> scripts/vms/csv.log")
 
 
-
-
+system("date >> scripts/vms/clean.log")

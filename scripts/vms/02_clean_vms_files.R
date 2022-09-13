@@ -59,46 +59,46 @@ clean_vms <- function(data, year, month) {
   # return(dt)
   
   fwrite(x = dt,
-         file = file.path(project_path, "processed_data", "MEX_VMS", paste0("MEX_VMS_", year, "_", month, ".csv")))
+         file = file.path(data_sets, "mex_fisheries", "mex_vms", "clean", paste0("MEX_VMS_", year, "_", month, ".csv")))
 }
 
-clean_vms2 <- function(data, year, month) {
-  browser()
-  names(data$path) <- data$src
-  dt <- data %$% 
-    map_dfr(path, fread,
-            select = 1:9,
-            colClasses = "character",
-            col.names = c("name", "vessel_rnpa", "port", "economic_unit", "datetime", "lat", "lon", "speed", "course"),
-            na.strings = c("NULL", "NA"),
-            blank.lines.skip = TRUE,
-            .id = "src")
-  
-  
-  dt[, `:=` (datetime = to_datetime(datetime), lat = as.numeric(lat), lon = as.numeric(lon))]
-  dt[, vessel_rnpa := fix_rnpa(vessel_rnpa)]
-  dt$year <- year
-  dt$month <- as.numeric(month)
-  
-  
-  # vessel_name_dictionary <- tibble(name = unique(dt$name)) %>% 
-  # mutate(vessel_name_norm = map_chr(name, normalize_shipname)) %>% 
-  # as.data.table()
-  
-  # setkey(vessel_name_dictionary, "name")
-  # setkey(dt, "name")
-  
-  # dt <- merge(dt, vessel_name_dictionary, by = "name")
-  # dt[name = NULL]
-  
-  # return(dt)
-  
-  # fwrite(x = dt,
-         # file = file.path(project_path, "processed_data", "MEX_VMS", paste0("MEX_VMS_", year, "_", month, ".csv")))
-}
+# clean_vms2 <- function(data, year, month) {
+#   browser()
+#   names(data$path) <- data$src
+#   dt <- data %$%
+#     map_dfr(path, fread,
+#             select = 1:9,
+#             colClasses = "character",
+#             col.names = c("name", "vessel_rnpa", "port", "economic_unit", "datetime", "lat", "lon", "speed", "course"),
+#             na.strings = c("NULL", "NA"),
+#             blank.lines.skip = TRUE,
+#             .id = "src")
+# #   
+# #   
+#   dt[, `:=` (datetime = to_datetime(datetime), lat = as.numeric(lat), lon = as.numeric(lon))]
+#   dt[, vessel_rnpa := fix_rnpa(vessel_rnpa)]
+#   dt$year <- year
+#   dt$month <- as.numeric(month)
+# #   
+# #   
+# #   # vessel_name_dictionary <- tibble(name = unique(dt$name)) %>% 
+# #   # mutate(vessel_name_norm = map_chr(name, normalize_shipname)) %>% 
+# #   # as.data.table()
+# #   
+# #   # setkey(vessel_name_dictionary, "name")
+# #   # setkey(dt, "name")
+# #   
+# #   # dt <- merge(dt, vessel_name_dictionary, by = "name")
+# #   # dt[name = NULL]
+# #   
+# #   # return(dt)
+# #   
+# #   # fwrite(x = dt,
+# #          # file = file.path(project_path, "processed_data", "MEX_VMS", paste0("MEX_VMS_", year, "_", month, ".csv")))
+# }
 
 
-paths <- list.files(path = file.path(project_path, "raw_data", "MEX_VMS"),
+paths <- list.files(path = file.path(data_sets, "mex_fisheries", "mex_vms", "raw"),
                     recursive = T,
                     pattern = "*.csv",
                     full.names = T)
@@ -133,9 +133,9 @@ plan(multisession, workers = 15)
 
 metadata %>% 
   select(year, month, path, src) %>%
-  nest(data = c(path, src)) %>% 
-  tail(1) %$%
-  pwalk(.l = list(data = data, year = year, month = month), clean_vms2)
+  # filter(year == 2008, month == "02") %>% 
+  nest(data = c(path, src)) %$%
+  pwalk(.l = list(data = data, year = year, month = month), clean_vms)
 
 plan(sequential)
 

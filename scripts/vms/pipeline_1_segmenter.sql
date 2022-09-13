@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE mex_fisheries.mex_vms_processed_v_20220323
+CREATE OR REPLACE TABLE mex_fisheries.mex_vms_processed_v_20220912
 AS
 WITH all_data AS (
   SELECT

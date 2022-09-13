@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE mex_fisheries.segment_info_v_20220323
+CREATE OR REPLACE TABLE mex_fisheries.segment_info_v_20220912
 AS
 SELECT
   seg_id,

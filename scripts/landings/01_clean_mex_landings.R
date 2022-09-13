@@ -3,14 +3,7 @@ library(janitor)
 library(data.table)
 library(tidyverse)
 
-# New data reading process
-
-files <- list.files(path = file.path(project_path, "raw_data", "CONAPESCA Avisos 2000-2019"),
-                    pattern = "*.csv",
-                    full.names = T)
-
-
-
+# Function to read and clean
 my_read <- function(path){
   fread(path,
         col.names = c("vessel_rnpa", "vessel_name",
@@ -41,6 +34,9 @@ my_read <- function(path){
            value = as.numeric(value))
 }
 
+files <- list.files(path = file.path(data_sets, "mex_fisheries", "mex_landings", "CONAPESCA Avisos 2000-2019"),
+                    pattern = "*.csv",
+                    full.names = T)
 
 dt <- map_dfr(files, my_read)
 
@@ -58,10 +54,8 @@ landings <- dt %>%
     by = .(year_cut, eu_rnpa, vessel_rnpa, main_species_group)] 
 
 
-
-fwrite(landings,
-       file.path(project_path, "processed_data", "MEX_LANDINGS", "mex_anual_landings_by_vessel.csv"),
-       append = F)
+saveRDS(object = landings,
+        file = file.path(data_sets, "mex_fisheries", "mex_landings", "clean", "mex_annual_landings_by_vessel.rds"))
 
 
 
