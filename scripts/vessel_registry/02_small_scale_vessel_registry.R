@@ -15,10 +15,10 @@ library(tidyverse)
 ## Load data  ###############################################################################################################################################
 # Maximum daily liters for each engine size and fuel type
 mdl_raw <-
-  read_csv(file.path(project_path, "raw_data", "maximum_daily_liters.csv"))
+  read_csv(file.path(data_sets, "mex_fisheries", "maximum_daily_liters.csv"))
 
 # The data are in an excel file, which contains three worksheets
-excel_data_file <- file.path(project_path,"raw_data","ANEXO-DGPPE-147220","ANEXO SISI 147220 - EmbarcacionesMenores.xlsx")
+excel_data_file <- file.path(data_sets, "mex_fisheries", "mex_vessel_registry", "raw","ANEXO-DGPPE-147220","ANEXO SISI 147220 - EmbarcacionesMenores.xlsx")
 
 # List of assets are on sheet 1
 ss_assets_raw <- read_excel(
@@ -103,14 +103,19 @@ ss_vessel_registry <- ss_assets_raw %>%
   ) %>% 
   mutate(fleet = "small scale") %>%
   drop_na(vessel_rnpa) %>% 
-  distinct()
+  distinct() %>% 
+  group_by(vessel_rnpa) %>% 
+  mutate(n = n()) %>% 
+  ungroup() %>% 
+  filter(n == 1) %>% 
+  select(-n)
 
 
 ## Export data  ###############################################################################################################################################
 
 # Save csv for gogole cloud bucket
 write.csv(x = ss_vessel_registry,
-          file = file.path(project_path, "processed_data", "MEX_VESSEL_REGISTRY", "small_scale_vessel_registry.csv"),
+          file = file.path(data_sets, "mex_fisheries", "mex_vessel_registry", "clean", "small_scale_vessel_registry.csv"),
           row.names = F)
 
 system("date >> scripts/vessel_registry/ss.log")
