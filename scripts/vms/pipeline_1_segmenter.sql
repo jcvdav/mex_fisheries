@@ -8,7 +8,7 @@ WITH all_data AS (
   IF(datetime IS NULL, "_datetime_missing", "") AS err,
   IF(datetime IS NULL, 1, 0) AS seq
 FROM
-  `emlab-gcp.mex_fisheries.mex_vms_v_20220323`
+  `emlab-gcp.mex_fisheries.mex_vms_v_20220912`
   WHERE lat IS NOT NULL
   AND lon IS NOT NULL
 ),

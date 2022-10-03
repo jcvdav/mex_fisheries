@@ -1,9 +1,9 @@
 #!/bin/bash
 # Set path
-export PROJECT_PATH="/Users/juancarlosvillasenorderbez/GitHub/data/data_sets"
+export PROJECT_PATH="/Users/juancarlosvillasenorderbez/GitHub/data_mex_fisheries/data/"
 
 # Upload all local csv files to GCS Bucket
-gsutil cp "$PROJECT_PATH"/mex_fisheries/mex_vms/clean/*.csv gs://mex_fisheries/MEX_VMS
+gsutil cp "$PROJECT_PATH"mex_vms/clean/*.csv gs://mex_fisheries/MEX_VMS
 
 # Create a partitioned table in Big Query
 #bq rm -f -t emlab-gcp:mex_fisheries.mex_vms_v_20220323
