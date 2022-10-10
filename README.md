@@ -6,9 +6,13 @@ There is a [Makefile](Makefile) outlining dependencies and order of operations, 
 
 ![](workflow.png)
 
-## VMS data (2011 - 2021)
+## VMS data (2008 - 2021)
 
-These data are available on three platforms:
+### Sources
+
+- [Datos abiertos](https://datos.gob.mx/busca/dataset/localizacion-y-monitoreo-satelital-de-embarcaciones-pesqueras)
+
+### Availability
 
 - emLab's shared team drive (`projects/current-projects/mex-fisheries/processed_data/MEX_VMS`) with monthly `*.csv` files
 - Google Cloud storage at: `gs://mex_fisheries/MEX_VMS/*` with monthly `*.csv` files
@@ -20,4 +24,19 @@ _NOTE: For details on the data cleaning, next steps, and know issues, see the de
 
 ## Landings data
 
+### Sources
+
+- [CONAPESCA Avisos 2000-2019]()
+- [CONAPESCA_apertura](https://conapesca.gob.mx/wb/cona/avisos_arribo_cosecha_produccion)
+- [datos_abiertos](https://datos.gob.mx/busca/dataset/produccion-pesquera)
+
+### Availability
+
+- Download an [`*Rds`]() file
+- Download a [`*csv`]() file
+
 ## Subsidy data
+
+### Sources
+
+### Availability
