@@ -62,10 +62,11 @@ files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA Avisos
 
 # Load data and apply filters --------------------------------------------------
 dt <- map_dfr(files, my_read) %>% 
-  filter(acuaculture_production == "NO",
-         !fishing_zone_type == "AGUAS CONTINENTALES",
+  filter(!fishing_zone_type == "AGUAS CONTINENTALES",
          !is.na(eu_rnpa)) %>% 
-  as_tibble()
+  as_tibble() %>% 
+  mutate(eu_rnpa = fix_rnpa(rnpa = eu_rnpa, length = 10),
+         vessel_rnpa = fix_rnpa(rnpa = vessel_rnpa))
 
 ## EXPORT ######################################################################
 # Export file ------------------------------------------------------------------

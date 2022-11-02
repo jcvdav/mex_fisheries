@@ -88,8 +88,7 @@ landings_clean <- rbind(landings_ls,
          live_weight,
          price,
          value) %>% 
-  filter(acuaculture_production %in% c("NO", "NULL"),
-         !fishing_zone_type == "AGUAS CONTINENTALES",
+  filter(!fishing_zone_type == "AGUAS CONTINENTALES",
          !is.na(eu_rnpa)) %>% 
   mutate(year_cut = as.numeric(year_cut))
 
