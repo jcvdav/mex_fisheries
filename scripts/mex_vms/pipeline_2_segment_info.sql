@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE mex_fisheries.segment_info_v_20220912
+CREATE OR REPLACE TABLE mex_fisheries.segment_info_v_20221104
 AS
 SELECT
   seg_id,
@@ -14,6 +14,6 @@ SELECT
   AVG(speed) AS average_speed,
   MIN(year) AS year_start,
   MAX(year) AS year_end
-FROM `emlab-gcp.mex_fisheries.mex_vms_processed_v_20220912`
+FROM `emlab-gcp.mex_fisheries.mex_vms_processed_v_20221104`
   GROUP BY seg_id
   ORDER BY seg_id;
