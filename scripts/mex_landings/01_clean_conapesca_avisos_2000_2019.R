@@ -54,16 +54,14 @@ my_read <- function(path){
 }
 
 # Identify files ---------------------------------------------------------------
-files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA Avisos 2000-2019"),
-                    pattern = "*.csv",
+files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA_Avisos_2000-2019"),
+                    pattern = "*\\.csv",
                     full.names = T)
 
 ## PROCESSING ##################################################################
 
 # Load data and apply filters --------------------------------------------------
 dt <- map_dfr(files, my_read) %>% 
-  filter(!fishing_zone_type == "AGUAS CONTINENTALES",
-         !is.na(eu_rnpa)) %>% 
   as_tibble() %>% 
   mutate(eu_rnpa = fix_rnpa(rnpa = eu_rnpa, length = 10),
          vessel_rnpa = fix_rnpa(rnpa = vessel_rnpa))

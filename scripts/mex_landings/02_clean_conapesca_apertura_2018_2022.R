@@ -38,7 +38,7 @@ col.names = c("vessel_rnpa", "vessel_name",
 
 # Load data --------------------------------------------------------------------
 files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA_apertura"),
-                    pattern = "*.xlsx",
+                    pattern = "*\\.xlsx",
                     full.names = T)
 
 landings_ls <- map_dfr(files, readxl::read_excel, col_types = "text", sheet = "AVISOS DE ARRIBO MAYORES") %>% 
@@ -88,8 +88,6 @@ landings_clean <- rbind(landings_ls,
          live_weight,
          price,
          value) %>% 
-  filter(!fishing_zone_type == "AGUAS CONTINENTALES",
-         !is.na(eu_rnpa)) %>% 
   mutate(year_cut = as.numeric(year_cut))
 
 ## EXPORT ######################################################################
