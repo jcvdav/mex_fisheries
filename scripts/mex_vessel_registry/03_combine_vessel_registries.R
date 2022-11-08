@@ -1,0 +1,40 @@
+######################################################
+#title#
+######################################################
+#
+# Purpose
+#
+######################################################
+
+# Packages
+library(here)
+library(data.table)
+library(tidyverse)
+
+source(here("scripts", "00_setup.R"))
+
+
+files <-
+  list.files(
+    path = here("data", "mex_vessel_registry", "clean"),
+    pattern = "scale",
+    full.names = T
+  )
+
+vessel_registry <- map_dfr(files,
+                           fread) %>%
+  mutate(vessel_rnpa = fix_rnpa(vessel_rnpa),
+         eu_rnpa = fix_rnpa(eu_rnpa, 10)) %>%
+  distinct() %>%
+  select(-target_species)
+
+fwrite(
+  x = vessel_registry,
+  file = here(
+    "data",
+    "mex_vessel_registry",
+    "clean" ,
+    "complete_vessel_registry.csv"
+  ),
+  append = F
+)
