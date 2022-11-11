@@ -3,13 +3,15 @@
 # Seciton 1 - Landings data
 # Section 2 - Vessel monitoring data
 # Section 3 - Vessel registry
-# Section 4 - Lobster concession polygons
+# Section 4 - Spatial features
+# Section 5 - Lobster concession polygons
 
 # Main targets
-mex_fisheries_data: mex_landings mex_vms mex_vessel_registry dag
+mex_fisheries_data: mex_landings mex_vms mex_vessel_registry spatial_features dag
 mex_landings: data/mex_landings/clean/mex_annual_landings_by_vessel.rds data/mex_landings/clean/mex_monthly_landings_by_vessel.rds data/mex_landings/clean/mex_annual_landings_by_eu.rds data/mex_landings/clean/mex_monthly_landings_by_eu.rds
 mex_vms: data/mex_vms/bq_pipeline.log
 mex_vessel_registry: data/mex_vessel_registry/upload.log
+spatial_features: data/spatial_features/upload.log
 dag: makefile-dag.png workflow.png
 
 # Section 1: Landings data #####################################################
@@ -37,7 +39,7 @@ data/mex_landings/clean/mex_conapesca_avisos_2000_2019.rds: scripts/mex_landings
 # Section 2: Vessel monitoring data ############################################
 
 # Execute BigQuery pipeline
-data/mex_vms/bq_pipeline.log: scripts/mex_vms/04_bigquery_pipeline.sh data/mex_vms/upload.log
+data/mex_vms/bq_pipeline.log: scripts/mex_vms/04_bigquery_pipeline.sh data/mex_vms/upload.log scripts/mex_vms/pipeline_1_segmenter.sql scripts/mex_vms/pipeline_2_segment_info.sql data/spatial_features/upload.log
 		cd $(<D);bash $(<F)
 
 # Upload to BigQuery
@@ -55,25 +57,43 @@ data/mex_vms/raw/xls_to_csv_logs.log: scripts/mex_vms/01_convert_excel_to_csv.R
 # Section 3: Vessel registry ####################################################
 
 data/mex_vessel_registry/upload.log: scripts/mex_vessel_registry/04_upload_registry_files.sh data/mex_vessel_registry/clean/complete_vessel_registry.csv
-	cd $(<D);bash $(<F)
+		cd $(<D);bash $(<F)
 
 data/mex_vessel_registry/clean/complete_vessel_registry.csv: scripts/mex_vessel_registry/03_combine_vessel_registries.R data/mex_vessel_registry/clean/large_scale_vessel_registry.csv data/mex_vessel_registry/clean/small_scale_vessel_registry.csv
-	cd $(<D);Rscript $(<F)
+		cd $(<D);Rscript $(<F)
 	
 data/mex_vessel_registry/clean/small_scale_vessel_registry.csv: scripts/mex_vessel_registry/02_small_scale_vessel_registry.R
-	cd $(<D);Rscript $(<F)
+		cd $(<D);Rscript $(<F)
 	
 data/mex_vessel_registry/clean/large_scale_vessel_registry.csv: scripts/mex_vessel_registry/01_large_scale_vessel_registry.R
-	cd $(<D);Rscript $(<F)
+		cd $(<D);Rscript $(<F)
 
-# Section 4: Lobster concession polygons #######################################
+# Section 4: Spatial features ##################################################
+
+data/spatial_features/upload.log: scripts/spatial_features/07_upload_spatial_features.sh data/spatial_features/clean/spatial_features.csv
+		cd $(<D);bash $(<F)
+
+data/spatial_features/clean/spatial_features.csv: scripts/spatial_features/06_combine_spatial_features.R data/spatial_features/clean/*.tif
+		cd $(<D);Rscript $(<F)
+
+data/spatial_features/clean/seas_raster.tif seas_dictionary.csv: scripts/spatial_features/01_seas_raster.R data/spatial_features/raw/GOaS/goas_v01.gpkg
+		cd $(<D);Rscript $(<F)
+	
+data/spatial_features/clean/distance_to_shore_raster.tif: scripts/spatial_features/03_distance_to_shore_raster.R data/spatial_features/raw/land_distance/gb_land_distance.asc
+		cd $(<D);Rscript $(<F)
+
+data/spatial_features/clean/distance_to_port_raster.tif: scripts/spatial_features/04_distance_to_port_raster.R data/spatial_features/raw/port_distance/port_distance.asc
+		cd $(<D);Rscript $(<F)
+	
+data/spatial_features/clean/depth_raster.tif: scripts/spatial_features/05_depth_raster.R data/spatial_features/raw/depth/gb_depth.asc
+		cd $(<D);Rscript $(<F)
+
+# Section 5: Lobster concession polygons #######################################
 
 # Other components
 # draw makefile dag
 makefile-dag.png: Makefile
 		make -Bnd | make2graph -b | dot -Tpng -Gdpi=300 -o makefile-dag.png
-	
-workflow.png: Makefile
-LANG=C make -p | python3 make_p_to_json.py | python3 json_to_dot.py | dot -Tpng -Gdpi=300 -o workflow.png
 
-		
+workflow.png: Makefile
+		LANG=C make -pBnd | python3 make_p_to_json.py | python3 json_to_dot.py | dot -Tpng -Gdpi=300 -o workflow.png
