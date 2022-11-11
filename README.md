@@ -40,3 +40,13 @@ _NOTE: For details on the data cleaning, next steps, and know issues, see the de
 ### Sources
 
 ### Availability
+
+## Spatial features
+
+### Sources
+
+- [Sea: Global Oceans and Seas](https://www.marineregions.org/sources.php)
+- [EEZ: Marine and land zones: the union of world country boundaries and EEZ's](https://www.marineregions.org/sources.php)
+- [Distance from shore](https://gmed.auckland.ac.nz/download.html)
+- [Distance from port](https://gmed.auckland.ac.nz/download.html)
+- [Depth](https://gmed.auckland.ac.nz/download.html)
