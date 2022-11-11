@@ -8,9 +8,10 @@ SELECT
   SUM(IF(speed > 0.1, 1, 0) * hours) AS active_hours,
   MIN(datetime) AS first_timestamp,
   MAX(datetime) AS last_timestamp,
+  MAX(lon) AS max_lon,
+  MIN(lon) AS min_lon,
   MAX(lat) AS max_lat,
   MIN(lat) AS min_lat,
-  MAX(lon) AS max_lon,
   AVG(speed) AS average_speed,
   MIN(year) AS year_start,
   MAX(year) AS year_end
