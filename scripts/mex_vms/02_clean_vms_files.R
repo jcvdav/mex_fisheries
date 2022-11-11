@@ -109,7 +109,7 @@ metadata <- tibble(path = paths) %>%
   mutate(
     file = basename(path),
     day_range = str_extract(file, pattern = "[:digit:]+-[:digit:]+"),
-    month = str_extract(file, pattern = "[:alpha:]+"),
+    month = str_extract(file, pattern = "[:alpha:]{3}"),
     year = as.numeric(str_extract(file, pattern = "[:digit:]{4}")),
     month = case_when(
       month == "ENE" ~ "01",
@@ -142,7 +142,7 @@ plan(multisession, workers = parallel::detectCores() - 2)
 metadata %>%
   select(year, month, path, src) %>%
   nest(data = c(path, src)) %$%
-  pwalk(.l = list(data = data, year = year, month = month), clean_vms)
+  future_pwalk(.l = list(data = data, year = year, month = month), clean_vms)
 
 ## EXPORT ######################################################################
 system(paste0("date >> ", here::here("data", "mex_vms", "clean", "clean.log")))
