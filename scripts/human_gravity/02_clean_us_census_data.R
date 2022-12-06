@@ -24,15 +24,16 @@ us_pop_data <- read_csv(file = "data/human_population/raw/ACSST5Y2020.S0101_2022
               skip = 2,
               col_select = 1:3,
               col_names = c("geography", "name", "population")) %>% 
-  filter(str_detect(name, "California"))
+  filter(str_detect(name, "California|Oregon"))
 
-tracts <- tigris::tracts(state = "CA", cb = T)
+tracts <- tigris::tracts(cb = T)
 
 ## PROCESSING ##################################################################
 
 # Select columns and filter ----------------------------------------------------
 clean_us_pop <- 
   tracts %>% 
+  filter(STATE_NAME %in% c("California", "Oregon")) %>% 
   st_centroid() %>% 
   st_transform(crs = "EPSG:4326") %>% 
   left_join(us_pop_data, by = c("AFFGEOID" = "geography")) %>% 

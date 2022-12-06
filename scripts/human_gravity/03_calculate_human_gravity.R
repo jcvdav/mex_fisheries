@@ -24,7 +24,6 @@ library(tidyverse)
 # Load data --------------------------------------------------------------------
 
 us_pop <- st_read(dsn = here("data", "human_population", "processed", "usa_population.gpkg")) %>% 
-  filter(state == "California") %>% 
   select(state, population)
 
 mx_pop <- st_read(dsn = here("data", "human_population", "processed", "mex_population.gpkg")) %>% 
@@ -46,13 +45,7 @@ coast <- ne_countries(country = c("Mexico", "United States of America"),
 
 # base_grid <- raster(here("../data_remotes","data", "standard_grid.tif"))
 
-kelp_files <- list.files(
-  path = here("../data_remotes", "data", "kelp", "processed", "area"),
-  pattern = "tif",
-  full.names = T) %>% 
-  stack()
-
-kelp_grid <- sum(kelp_files > 0)
+kelp_pts <- st_read(here("../data_remotes", "data", "kelp", "processed", "area", "pixels_with_kelp.gpkg"))
 
 # Define functions -------------------------------------------------------------
 # Create function to call on each point. The function takes four arguments:
@@ -136,10 +129,6 @@ pop_within_coast <- pop %>%
 #   as.data.frame(xy = T) %>% 
 #   st_as_sf(coords = c("x", "y"), crs = 4326)
 # 
-kelp_pts <- kelp_grid %>% 
-  as.data.frame(xy = T) %>% 
-  drop_na() %>% 
-  st_as_sf(coords = c("x", "y"), crs = 4326)
 
 
 # Un-comment to visualize layers that go into the calculation
@@ -155,9 +144,11 @@ kelp_pts <- kelp_grid %>%
 # You can also use the coordinates for the towns of relevance, not the coasline,
 # to get a more precise value.
 gravity <- kelp_pts %>%
+  select(-gravity) %>%
   mutate(id = 1:nrow(.)) %>%
   group_by(id) %>%
   nest() %>%
+  ungroup() %>% 
   mutate(gravity = map_dbl(data,
                            get_gravity,
                            cities = pop_within_coast ,
