@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE mex_fisheries.mex_vms_processed_v_20220912
+CREATE OR REPLACE TABLE mex_fisheries.mex_vms_processed_v_20221104
 AS
 WITH all_data AS (
   SELECT
@@ -6,11 +6,15 @@ WITH all_data AS (
   *,
   CONCAT(year, "_", month)AS ym,
   IF(datetime IS NULL, "_datetime_missing", "") AS err,
-  IF(datetime IS NULL, 1, 0) AS seq
+  IF(datetime IS NULL, 1, 0) AS seq,
+  FLOOR(lat / 0.05) * 0.05 + 0.025 AS lat_center,
+  FLOOR(lon / 0.05) * 0.05 + 0.025 AS lon_center
 FROM
-  `emlab-gcp.mex_fisheries.mex_vms_v_20220912`
+  `emlab-gcp.mex_fisheries.mex_vms_v_20221104`
   WHERE lat IS NOT NULL
   AND lon IS NOT NULL
+  AND lat between -90 AND 90
+  AND lon between -180 AND 180
 ),
   #
   #
@@ -67,7 +71,6 @@ segmented AS(
         ORDER BY seq, datetime, year, month
         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS point_in_seg
 FROM step)
-
 #
 #
 #
@@ -84,9 +87,15 @@ SELECT
   datetime,
   lat,
   lon,
+  sea,
+  eez,
+  distance_from_port_m,
+  distance_from_shore_m,
+  depth_m,
   speed,
   course,
   year,
   month,
   IF(hours >= 24, NULL, hours) AS hours
-FROM segmented;
+FROM segmented
+LEFT JOIN `emlab-gcp.mex_fisheries.spatial_features` USING (lon_center, lat_center);
