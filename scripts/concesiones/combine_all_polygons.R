@@ -14,67 +14,43 @@
 
 # Load packages ----------------------------------------------------------------
 library(here)
-library(rmapshaper)
-library(fasterize)
-library(raster)
 library(sf)
 library(tidyverse)
 
 # Load data --------------------------------------------------------------------
-seas_raw <- st_read(here("data", "spatial_features", "raw", "GOaS_v1_20211214_gpkg", "goas_v01.gpkg")) %>% 
-  select(name) %>% 
-  arrange(name) %>% 
-  mutate(id = 1:nrow(.))
+lobster <-
+  sf::st_read(dsn = here(
+    "data",
+    "concesiones",
+    "processed",
+    "lobster_permit_and_concessions_polygons.gpkg"
+  ))
 
-reference_raster <-
-  raster(
-    xmn = -180,
-    xmx = 180,
-    ymn = -90,
-    ymx = 90,
-    resolution = 0.05
-  )
+urchin <-
+  sf::st_read(dsn = here(
+    "data",
+    "concesiones",
+    "processed",
+    "urchin_permit_and_concessions_polygons.gpkg"
+  ))
+
+cucumber <-
+  sf::st_read(dsn = here(
+    "data",
+    "concesiones",
+    "processed",
+    "sea_cucumber_permit_and_concessions_polygons.gpkg"
+  ))
 
 ## PROCESSING ##################################################################
 
 # X ----------------------------------------------------------------------------
-seas_raster <- fasterize(
-  sf = seas_raw,
-  raster = reference_raster,
-  field = "id",
-  background = NA
-)
-
-seas_data_frame <- seas_raw %>% 
-  st_drop_geometry()
+polygons <- bind_rows(lobster, urchin, cucumber) %>% 
+  select(eu_rnpa, fishery)
 
 ## EXPORT ######################################################################
 
 # X ----------------------------------------------------------------------------
-write.csv(
-  x = seas_data_frame,
-  file = here(
-    "data",
-    "spatial_features",
-    "clean",
-    "seas_dictionary.csv"
-  )
-)
-
-writeRaster(
-  seas_raster,
-  filename = here(
-    "data",
-    "spatial_features",
-    "clean",
-    "seas_raster.tif"
-  ),
-  overwrite = T
-)
-
-file.remove(here(
-  "data",
-  "spatial_features",
-  "clean",
-  "seas_raster.tif.aux.xml"
-))
+st_write(obj = polygons,
+         dsn = here("data", "concesiones", "processed", "all_spp_permit_and_concessions_polygons.gpkg"),
+         delete_dsn = T)

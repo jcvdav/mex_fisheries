@@ -29,30 +29,29 @@ rw <- function(x) {
   data <- read_excel(
     path = x,
     sheet = 1,
-    skip = 1,
     col_types = c(
       "text",
       "text",
       "text",
       "text",
-      "date",
-      "numeric",
-      "numeric",
-      "numeric",
-      "numeric"
+      "text",
+      "text",
+      "text",
+      "text",
+      "text"
     ),
-    na = "NULL",
-    col_names = c(
-      "name",
-      "rnpa",
-      "port",
-      "economic_unit",
-      "datetime",
-      "lat",
-      "lon",
-      "speed",
-      "course"
-    )
+    na = "NULL"#,
+    # col_names = c(
+      # "name",
+      # "rnpa",
+      # "port",
+      # "economic_unit",
+      # "datetime",
+      # "lat",
+      # "lon",
+      # "speed",
+      # "course"
+    # )
   )
   
   fwrite(x = data, file = new_file, na = "NULL")

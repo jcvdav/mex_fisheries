@@ -14,6 +14,7 @@
 
 # Load packages ----------------------------------------------------------------
 library(here)
+library(janitor)
 library(data.table)
 library(furrr)
 library(magrittr)
@@ -34,7 +35,40 @@ to_datetime <- function(x) {
   return(datetime)
 }
 
-# Cleaning funciton 
+# Standardize column names
+fix_colnames <- function(file){
+  data <- file %>% 
+    clean_names() %>% 
+    select(sort(names(.)))
+  
+  current_colnames <- colnames(data)
+  
+  fixed_colnames <- case_when(current_colnames %in% c("embarcaci_n", "nombre") ~ "name",
+                              current_colnames %in% c("rnp") ~ "vessel_rnpa",
+                              current_colnames %in% c("puerto_base",
+                                                      "descripcion",
+                                                      "descripcion_3") ~ "port",
+                              current_colnames %in% c("permisionario_o_concesionario",
+                                                      "pemisionario_o_concesionario",
+                                                      "razon_social",
+                                                      "raz_n_social",
+                                                      "descripcion_2",
+                                                      "descripcion_4") ~ "economic_unit",
+                              current_colnames %in% c("fecha",
+                                                      "fecha_recepcion_unitrac") ~ "datetime",
+                              current_colnames %in% c("latitud") ~ "lat",
+                              current_colnames %in% c("longitud") ~ "lon",
+                              current_colnames %in% c("velocidad") ~ "speed",
+                              current_colnames %in% c("curso",
+                                                      "rumbo") ~ "course")
+  
+  colnames(data) <- fixed_colnames
+  
+  return(data)
+}
+
+
+# Cleaning function 
 clean_vms <- function(data, year, month) {
   
   # Assign names to each path --------------------------------------------------
@@ -42,28 +76,18 @@ clean_vms <- function(data, year, month) {
   
   # Read in --------------------------------------------------------------------
   dt <- data %$%
-    map_dfr(
+    map(
       path,
       fread,
       select = 1:9,
       colClasses = "character",
-      col.names = c(
-        "name",
-        "vessel_rnpa",
-        "port",
-        "economic_unit",
-        "datetime",
-        "lat",
-        "lon",
-        "speed",
-        "course"
-      ),
       na.strings = c("NULL", "NA"),
-      blank.lines.skip = TRUE,
-      .id = "src"
-    )
+      blank.lines.skip = TRUE
+    ) %>% 
+    map(fix_colnames) %>% 
+    bind_rows(.id = "src")
   
-  
+  setkey(dt, vessel_rnpa)
   
   # Process the data -----------------------------------------------------------
   dt[, `:=` (
@@ -74,6 +98,9 @@ clean_vms <- function(data, year, month) {
   dt[, vessel_rnpa := fix_rnpa(vessel_rnpa)]
   dt$year <- year
   dt$month <- as.numeric(month)
+  
+  dt <- dt %>% 
+    select(src, name, vessel_rnpa, port, economic_unit, datetime, lat, lon, speed, course, year, month)
   
   # Export the file ------------------------------------------------------------
   fwrite(
@@ -142,47 +169,10 @@ plan(multisession, workers = parallel::detectCores() - 2)
 metadata %>%
   select(year, month, path, src) %>%
   nest(data = c(path, src)) %$%
-  future_pwalk(.l = list(data = data, year = year, month = month), clean_vms)
+  future_pwalk(.l = list(data = data, year = year, month = month),
+               .f = clean_vms)
+
+plan(sequential)
 
 ## EXPORT ######################################################################
 system(paste0("date >> ", here::here("data", "mex_vms", "clean", "clean.log")))
-
-# X ----------------------------------------------------------------------------
-
-## Set up
-# Load packages
-
-# clean_vms2 <- function(data, year, month) {
-#   browser()
-#   names(data$path) <- data$src
-#   dt <- data %$%
-#     map_dfr(path, fread,
-#             select = 1:9,
-#             colClasses = "character",
-#             col.names = c("name", "vessel_rnpa", "port", "economic_unit", "datetime", "lat", "lon", "speed", "course"),
-#             na.strings = c("NULL", "NA"),
-#             blank.lines.skip = TRUE,
-#             .id = "src")
-# #
-# #
-#   dt[, `:=` (datetime = to_datetime(datetime), lat = as.numeric(lat), lon = as.numeric(lon))]
-#   dt[, vessel_rnpa := fix_rnpa(vessel_rnpa)]
-#   dt$year <- year
-#   dt$month <- as.numeric(month)
-# #
-# #
-# #   # vessel_name_dictionary <- tibble(name = unique(dt$name)) %>%
-# #   # mutate(vessel_name_norm = map_chr(name, normalize_shipname)) %>%
-# #   # as.data.table()
-# #
-# #   # setkey(vessel_name_dictionary, "name")
-# #   # setkey(dt, "name")
-# #
-# #   # dt <- merge(dt, vessel_name_dictionary, by = "name")
-# #   # dt[name = NULL]
-# #
-# #   # return(dt)
-# #
-# #   # fwrite(x = dt,
-# #          # file = file.path(project_path, "processed_data", "MEX_VMS", paste0("MEX_VMS_", year, "_", month, ".csv")))
-# }

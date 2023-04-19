@@ -33,7 +33,7 @@ connection <- dbConnect(drv = bigquery(),
                         allowLargeResults = TRUE)
 
 mex_vms <- tbl(src = connection,
-               from = "mex_vms_processed_v_20221104")
+               from = "mex_vms_processed_v_20230419")
 
 ## PROCESSING ##################################################################
 
