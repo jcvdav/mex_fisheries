@@ -88,8 +88,19 @@ data/spatial_features/clean/distance_to_port_raster.tif: scripts/spatial_feature
 data/spatial_features/clean/depth_raster.tif: scripts/spatial_features/05_depth_raster.R data/spatial_features/raw/depth/gb_depth.asc
 		cd $(<D);Rscript $(<F)
 
-# Section 5: Lobster concession polygons #######################################
+# Section 5: TURFS #############################################################
 
+data/concesiones/processed/all_spp_permit_and_concessions_polygons.gpkg: scripts/concesiones/combine_all_polygons.R data/concesiones/processed/lobster_permit_and_concessions_polygons.gpkg data/concesiones/processed/urchin_permit_and_concessions_polygons.gpkg data/concesiones/processed/cucumber_permit_and_concessions_polygons.gpkg
+		cd $(<D);Rscript $(<F)
+
+data/concesiones/processed/lobster_permit_and_concessions_polygons.gpkg: scripts/concesiones/langosta/04_clean_Nurs_version.R
+		cd $(<D);Rscript $(<F)
+		
+data/concesiones/processed/urchin_permit_and_concessions_polygons.gpkg:
+		cd $(<D);Rscript $(<F)
+		
+data/concesiones/processed/cucumber_permit_and_concessions_polygons.gpkg:
+		cd $(<D);Rscript $(<F)
 # Other components
 # draw makefile dag
 makefile-dag.png: Makefile
