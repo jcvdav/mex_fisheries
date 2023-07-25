@@ -102,9 +102,6 @@ data/concesiones/processed/urchin_permit_and_concessions_polygons.gpkg:
 data/concesiones/processed/cucumber_permit_and_concessions_polygons.gpkg:
 		cd $(<D);Rscript $(<F)
 # Other components
-# draw makefile dag
-makefile-dag.png: Makefile
-		make -Bnd | make2graph -b | dot -Tpng -Gdpi=300 -o makefile-dag.png
 
 workflow.png: Makefile
 		LANG=C make -pBnd | python3 make_p_to_json.py | python3 json_to_dot.py | dot -Tpng -Gdpi=300 -o workflow.png
