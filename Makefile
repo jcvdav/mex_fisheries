@@ -12,7 +12,7 @@ mex_landings: data/mex_landings/clean/mex_annual_landings_by_vessel.rds data/mex
 mex_vms: data/mex_vms/bq_pipeline.log
 mex_vessel_registry: data/mex_vessel_registry/upload.log
 spatial_features: data/spatial_features/upload.log
-dag: makefile-dag.png workflow.png
+dag: workflow.png
 
 # Section 1: Landings data #####################################################
 
@@ -76,7 +76,7 @@ data/spatial_features/upload.log: scripts/spatial_features/07_upload_spatial_fea
 data/spatial_features/clean/spatial_features.csv: scripts/spatial_features/06_combine_spatial_features.R data/spatial_features/clean/*.tif
 		cd $(<D);Rscript $(<F)
 
-data/spatial_features/clean/seas_raster.tif seas_dictionary.csv: scripts/spatial_features/01_seas_raster.R data/spatial_features/raw/GOaS/goas_v01.gpkg
+data/spatial_features/clean/seas_raster.tif seas_dictionary.csv: scripts/spatial_features/01_seas_raster.R data/spatial_features/raw/GOaS_v1_20211214_gpkg/goas_v01.gpkg
 		cd $(<D);Rscript $(<F)
 	
 data/spatial_features/clean/distance_to_shore_raster.tif: scripts/spatial_features/03_distance_to_shore_raster.R data/spatial_features/raw/land_distance/gb_land_distance.asc
