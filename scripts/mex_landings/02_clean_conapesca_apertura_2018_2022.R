@@ -8,6 +8,8 @@
 #
 # Cleaing data from: https://conapesca.gob.mx/wb/cona/avisos_arribo_cosecha_produccion
 #
+# Data last downloaded on June 9, 2023
+# 
 ################################################################################
 
 ## SET UP ######################################################################
@@ -16,6 +18,9 @@
 library(here)
 library(readxl)
 library(tidyverse)
+
+# Load and define functions ----------------------------------------------------
+source(here("scripts", "00_setup.R"))
 
 col.names = c("vessel_rnpa", "vessel_name",
               "landing_site_key", "landing_site",
@@ -53,42 +58,50 @@ landings_ss <- map_dfr(files, readxl::read_excel, col_types = "text", sheet = "A
 # Rename and filter ------------------------------------------------------------
 landings_clean <- rbind(landings_ls,
                         landings_ss) %>% 
-  mutate(landed_weight = coalesce(peso_desembarcado_kg, peso_desembarcado),
-         live_weight = coalesce(peso_vivo_kg, peso_vivo),
-         price = coalesce(precio_por_kilogramo_pesos, precio),
-         value = coalesce(valor_pesos, valor),
-         landed_weight = as.numeric(landed_weight),
-         value = as.numeric(value)) %>% 
-  select(state = nombre_estado,
-         office_name = nombre_oficina,
-         fleet,
-         vessel_rnpa = rnp_activo,
-         vessel_name = nombre_activo,
-         landing_site = nombre_sitio_desembarque,
-         eu_rnpa = rnpa_unidad_economica,
-         economic_unit = unidad_economica,
-         origin = origen,
-         fishing_site_name = nombre_lugarcaptura,
-         n_vessels = numero_embarcaciones,
-         month_cut = mes_corte,
-         year_cut = ano_corte,
-         period_start = periodo_inicio,
-         period_end = periodo_fin,
-         period_length = duracion,
-         period_effective_days = dias_efectivos,
-         fishing_zone_type = tipo_zona,
-         acuaculture_production = produccion_acuacultural,
-         permit_number = numero_permiso,
-         permit_issue_date = fecha_expedicion,
-         permit_expiration_date = fecha_vigencia,
-         main_species_group = nombre_principal,
-         species_key = clave_especie,
-         species_name = nombre_especie,
-         landed_weight,
-         live_weight,
-         price,
-         value) %>% 
-  mutate(year_cut = as.numeric(year_cut))
+  mutate(
+    landed_weight = coalesce(peso_desembarcado_kg, peso_desembarcado),
+    live_weight = coalesce(peso_vivo_kg, peso_vivo),
+    price = coalesce(precio_por_kilogramo_pesos, precio),
+    value = coalesce(valor_pesos, valor),
+    landed_weight = as.numeric(landed_weight),
+    live_weight = as.numeric(live_weight),
+    value = as.numeric(value)) %>% 
+  select(
+    state = nombre_estado,
+    office_name = nombre_oficina,
+    fleet,
+    vessel_rnpa = rnp_activo,
+    vessel_name = nombre_activo,
+    landing_site = nombre_sitio_desembarque,
+    eu_rnpa = rnpa_unidad_economica,
+    economic_unit = unidad_economica,
+    origin = origen,
+    fishing_site_name = nombre_lugarcaptura,
+    n_vessels = numero_embarcaciones,
+    month_cut = mes_corte,
+    year_cut = ano_corte,
+    period_start = periodo_inicio,
+    period_end = periodo_fin,
+    period_length = duracion,
+    period_effective_days = dias_efectivos,
+    fishing_zone_type = tipo_zona,
+    acuaculture_production = produccion_acuacultural,
+    permit_number = numero_permiso,
+    permit_issue_date = fecha_expedicion,
+    permit_expiration_date = fecha_vigencia,
+    main_species_group = nombre_principal,
+    species_key = clave_especie,
+    species_name = nombre_especie,
+    landed_weight,
+    live_weight,
+    price,
+    value) %>% 
+  mutate(
+    year_cut = as.numeric(year_cut),
+    acuaculture_production = case_when(acuaculture_production == "SÃ\u008d" ~ "SÍ",
+                                       acuaculture_production == "NO" ~ "NO",
+                                       T ~ NA_character_),
+    eu_rnpa = fix_rnpa(eu_rnpa, length = 10))
 
 ## EXPORT ######################################################################
 

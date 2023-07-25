@@ -50,6 +50,7 @@ my_read <- function(path){
     mutate(source = basename(path),
            year_cut = as.numeric(year_cut),
            landed_weight = as.numeric(landed_weight),
+           live_weight = as.numeric(live_weight),
            value = as.numeric(value))
 }
 
@@ -64,7 +65,9 @@ files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA_Avisos
 dt <- map_dfr(files, my_read) %>% 
   as_tibble() %>% 
   mutate(eu_rnpa = fix_rnpa(rnpa = eu_rnpa, length = 10),
-         vessel_rnpa = fix_rnpa(rnpa = vessel_rnpa))
+         vessel_rnpa = fix_rnpa(rnpa = vessel_rnpa),
+         acuaculture_production = case_when(acuaculture_production == "" ~ NA_character_,
+                                            T ~ acuaculture_production))
 
 ## EXPORT ######################################################################
 # Export file ------------------------------------------------------------------

@@ -13,11 +13,14 @@
 ## SET UP ######################################################################
 
 # Load packages ----------------------------------------------------------------
-library(here)
-library(tidyverse)
+pacman::p_load(
+  here,
+  tidyverse
+)
 
 # Load data --------------------------------------------------------------------
-landings <- readRDS(here("data", "mex_landings", "clean", "mex_landings_2000_2022.rds"))
+landings <- readRDS(here("data", "mex_landings", "clean", "mex_landings_2000_2022.rds")) %>% 
+  filter(!acuaculture_production == "SÍ")
 
 ## PROCESSING ##################################################################
 
@@ -25,6 +28,7 @@ landings <- readRDS(here("data", "mex_landings", "clean", "mex_landings_2000_202
 monthly_by_vessel <- landings %>% 
   group_by(year, month, eu_rnpa, vessel_rnpa, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
+            live_weight = sum(live_weight, na.rm = T),
             value = sum(value, na.rm = T)) %>% 
   ungroup()
 
@@ -32,6 +36,7 @@ monthly_by_vessel <- landings %>%
 annual_by_vessel <- monthly_by_vessel %>% 
   group_by(year, eu_rnpa, vessel_rnpa, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
+            live_weight = sum(live_weight, na.rm = T),
             value = sum(value, na.rm = T)) %>% 
   ungroup()
 
@@ -39,6 +44,7 @@ annual_by_vessel <- monthly_by_vessel %>%
 monthly_by_eu <- monthly_by_vessel %>% 
   group_by(year, month, eu_rnpa, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
+            live_weight = sum(live_weight, na.rm = T),
             value = sum(value, na.rm = T)) %>% 
   ungroup()
 
@@ -46,6 +52,7 @@ monthly_by_eu <- monthly_by_vessel %>%
 annual_by_eu <- monthly_by_eu %>% 
   group_by(year, eu_rnpa, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
+            live_weight = sum(live_weight, na.rm = T),
             value = sum(value, na.rm = T)) %>% 
   ungroup()
 

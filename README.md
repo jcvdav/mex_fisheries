@@ -4,7 +4,7 @@ This repository contains the code to clean and maintain the Mexican fisheries da
 
 There is a [Makefile](Makefile) outlining dependencies and order of operations, and the DAG is shown here:
 
-![](makefile-dag.png)
+![](workflow.png)
 
 ## VMS data (2007 - 2022 [partial])
 

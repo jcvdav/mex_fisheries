@@ -74,6 +74,7 @@ clean_pepino <- pepino %>%
   st_cast("POLYGON") %>% 
   st_make_valid() %>% 
   rename(eu_name = name) %>% 
+  mutate(eu_name = clean_eu_names(eu_name)) %>% 
   group_by(eu_name, eu_rnpa, management) %>% 
   summarize(a = 1) %>% 
   ungroup() %>% 
