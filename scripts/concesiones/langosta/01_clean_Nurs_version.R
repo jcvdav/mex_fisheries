@@ -13,9 +13,11 @@
 ## SET UP ######################################################################
 
 # Load packages ----------------------------------------------------------------
-library(here)
-library(sf)
-library(tidyverse)
+pacman::p_load(
+  here,
+  sf,
+  tidyverse
+)
 
 # Load data --------------------------------------------------------------------
 lobster_polygons <- st_read(dsn = here("data", "concesiones", "raw", "TURF_Lobster_2022"),
@@ -136,5 +138,5 @@ final <- clean_lobster_polygons %>%
 
 # X ----------------------------------------------------------------------------
 st_write(obj = final,
-         dsn = here("data", "concesiones", "processed", "lobster_permit_and_concessions_polygons.gpkg"),
+         dsn = here("data", "concesiones", "processed", "nurs_lobster_permit_and_concessions_polygons.gpkg"),
          delete_dsn = T)
