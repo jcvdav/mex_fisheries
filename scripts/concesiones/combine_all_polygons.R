@@ -48,7 +48,7 @@ cucumber <-
 
 # X ----------------------------------------------------------------------------
 polygons <- bind_rows(lobster, urchin, cucumber) %>% 
-  select(eu_rnpa, fishery)
+  select(eu_name, eu_rnpa, fishery)
 
 ## EXPORT ######################################################################
 

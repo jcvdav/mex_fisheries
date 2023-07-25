@@ -128,6 +128,7 @@ final <- clean_lobster_polygons %>%
   ) %>% 
   st_transform(crs = 4326) %>% 
   filter(!(management == "Permit" & eu_rnpa == "0203000302")) %>% 
+  mutate(eu_name = clean_eu_names(eu_name)) %>% 
   group_by(eu_name, eu_rnpa, management) %>% 
   summarize(a = 1) %>% 
   ungroup() %>% 

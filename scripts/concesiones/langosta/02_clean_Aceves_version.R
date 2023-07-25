@@ -56,7 +56,8 @@ missing_polygons <- raw_shp %>%
                              source == "BCS17" ~ "0305000036"),
          management = "Concession",
          fishery = "lobster") %>% 
-  select(-source)
+  select(-source) %>% 
+  mutate(eu_name = clean_eu_names(eu_name))
 
 ## EXPORT ######################################################################
 

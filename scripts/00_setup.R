@@ -16,15 +16,9 @@ subsidies_path <- file.path(sys_path,"Shared drives/emlab/projects/current-proje
 data_sets <- "/Users/juancarlosvillasenorderbez/GitHub/data/data_sets"
 
 # Functions
-fix_rnpa <- function(rnpa, length = 8){
-  rnpa[is.na(rnpa)] <- "_"
-  lengths <- stringr::str_length(rnpa)
-  missing <- pmax(length - lengths, 0)
-  zeroes <- purrr::map_chr(missing, ~paste(numeric(length = .x), collapse = ""))
-  out <- paste0(zeroes, rnpa)
-  return(out)
-}
 
+source(here::here("scripts", "helpers_clean_eu_names.R"))
+source(here::here("scripts", "helpers_fix_rnpa.R"))
 # String-fixing function
 str_fix <- function(x) {
   x <- str_to_upper(x)        # String to upper
