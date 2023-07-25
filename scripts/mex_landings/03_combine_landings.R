@@ -13,8 +13,10 @@
 ## SET UP ######################################################################
 
 # Load packages ----------------------------------------------------------------
-library(here)
-library(tidyverse)
+pacman::p_load(
+  here,
+  tidyverse
+)
 
 # Load data --------------------------------------------------------------------
 stuart <- readRDS(here("data", "mex_landings", "clean", "mex_conapesca_avisos_2000_2019.rds")) %>% 
@@ -36,7 +38,7 @@ landings <- bind_rows(stuart, apertura, .id = "source") %>%
          year = year_cut,
          month = month,
          eu_rnpa,
-         economic_unit,
+         eu_name = economic_unit,
          fleet,
          acuaculture_production,
          vessel_rnpa,
@@ -44,7 +46,8 @@ landings <- bind_rows(stuart, apertura, .id = "source") %>%
          main_species_group,
          landed_weight,
          live_weight,
-         value)
+         value) %>% 
+  mutate(eu_name = clean_eu_names(eu_name))
 
 ## EXPORT ######################################################################
 

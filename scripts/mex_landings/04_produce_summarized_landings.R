@@ -13,8 +13,10 @@
 ## SET UP ######################################################################
 
 # Load packages ----------------------------------------------------------------
-library(here)
-library(tidyverse)
+pacman::p_load(
+  here,
+  tidyverse
+)
 
 # Load data --------------------------------------------------------------------
 landings <- readRDS(here("data", "mex_landings", "clean", "mex_landings_2000_2022.rds")) %>% 
