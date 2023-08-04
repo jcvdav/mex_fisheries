@@ -15,9 +15,11 @@
 ## SET UP ######################################################################
 
 # Load packages ----------------------------------------------------------------
-library(here)
-library(readxl)
-library(tidyverse)
+pacman::p_load(
+  here,
+  readxl,
+  tidyverse
+)
 
 # Load and define functions ----------------------------------------------------
 source(here("scripts", "00_setup.R"))
@@ -101,7 +103,8 @@ landings_clean <- rbind(landings_ls,
     acuaculture_production = case_when(acuaculture_production == "SÃ\u008d" ~ "SÍ",
                                        acuaculture_production == "NO" ~ "NO",
                                        T ~ NA_character_),
-    eu_rnpa = fix_rnpa(eu_rnpa, length = 10))
+    eu_rnpa = fix_rnpa(eu_rnpa, length = 10),
+    vessel_rnpa = fix_rnpa(vessel_rnpa))
 
 ## EXPORT ######################################################################
 
