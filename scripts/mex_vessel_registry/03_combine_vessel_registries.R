@@ -23,7 +23,9 @@ files <-
 
 vessel_registry <- map_dfr(files,
                            fread) %>%
+  rename(eu_name = economic_unit) %>% 
   mutate(vessel_rnpa = fix_rnpa(vessel_rnpa),
+         eu_name = clean_eu_names(eu_name),
          eu_rnpa = fix_rnpa(eu_rnpa, 10)) %>%
   distinct() %>%
   select(-target_species)

@@ -136,6 +136,7 @@ ss_vessel_registry <- ss_assets_raw %>%
   ) %>%                                                     #
   filter(engine_power_hp > 0) %>%
   drop_na(eu_rnpa, vessel_rnpa, engine_power_hp) %>%
+  mutate(engine_power_kw = 0.7457 * engine_power_hp) %>% 
   select(
     eu_rnpa,
     economic_unit,
@@ -147,6 +148,7 @@ ss_vessel_registry <- ss_assets_raw %>%
     hull_material,
     contains("vessel_"),
     engine_power_hp,
+    engine_power_kw,
     engine_power_bin_hp,
     design_speed_kt,
     brand,
