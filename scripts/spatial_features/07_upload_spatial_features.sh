@@ -10,7 +10,7 @@ bq rm -f -t emlab-gcp:mex_fisheries.spatial_features
 
 # Create a BQ table
 bq mk --table \
---schema lon_center:NUMERIC,lat_center:NUMERIC,sea:INTEGER,eez:INTEGER,distance_from_port_m:FLOAT,distance_from_shore_m:FLOAT,depth_m:FLOAT \
+--schema lon_center:NUMERIC,lat_center:DECIMAL,sea:INTEGER,eez:INTEGER,distance_from_port_m:FLOAT,distance_from_shore_m:FLOAT,depth_m:FLOAT \
 --description "Spatial features" \
 emlab-gcp:mex_fisheries.spatial_features
 

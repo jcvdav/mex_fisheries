@@ -22,7 +22,11 @@ files <- list.files(
   path = here("data", "spatial_features", "clean"),
   pattern = "tif$",
   full.names = T)
-rasters <- rast(files)
+rasters <- rast(files) %>% 
+  focal(w = matrix(1, nrow = 5, ncol = 5),
+        na.rm = T,
+        fun = "min",
+        na.policy = "only")
 ## PROCESSING ##################################################################
 
 # X ----------------------------------------------------------------------------
@@ -38,8 +42,9 @@ features_df <- rasters %>%
     depth_m = gb_depth,
   ) %>% 
   mutate(
-    lon_center = round(lon_center, 3),
-    lat_center = round(lat_center, 3),
+    lon_center = round(lon_center, 4),
+    lat_center = round(lat_center, 4),
+    
     distance_from_port_m = distance_from_port_m * 1e5,
     distance_from_shore_m = distance_from_shore_m * 1e5,
     all_na = (

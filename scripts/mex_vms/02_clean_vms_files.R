@@ -17,6 +17,7 @@ library(here)
 library(janitor)
 library(data.table)
 library(furrr)
+library(sf)
 library(magrittr)
 library(tidyverse)
 
@@ -67,6 +68,25 @@ fix_colnames <- function(file){
   return(data)
 }
 
+# Clean land points
+#From: https://github.com/CBMC-GCMP/dafishr/blob/master/R/clean_land_points.R
+clean_land_points <- function(x, land) {
+  sf::sf_use_s2(FALSE)
+  
+  x <- drop_na(x, lat, lon) %>% 
+    sf::st_as_sf(coords = c("lon", "lat"),
+                 crs = 4326,
+                 remove = F)
+  x <- sf::st_filter(x, land, .predicate = st_disjoint)
+  x <- x |>
+    sf::st_drop_geometry()
+  return(x)
+}
+
+land <- rnaturalearth::ne_countries(country = c("Mexico"),
+                                    scale = "large",
+                                    returnclass = "sf") %>% 
+  sf::st_union()
 
 # Cleaning function 
 clean_vms <- function(data, year, month) {
@@ -92,16 +112,20 @@ clean_vms <- function(data, year, month) {
   # Process the data -----------------------------------------------------------
   dt[, `:=` (
     datetime = to_datetime(datetime),
-    lat = as.numeric(lat),
-    lon = as.numeric(lon)
+    lat = round(x = as.numeric(lat), digits = 4),
+    lon = round(x = as.numeric(lon), digits = 4)
   )]
   dt[, vessel_rnpa := fix_rnpa(vessel_rnpa)]
   dt$year <- year
   dt$month <- as.numeric(month)
   
-  dt <- dt %>% 
-    select(src, name, vessel_rnpa, port, economic_unit, datetime, lat, lon, speed, course, year, month)
   
+  dt <- dt %>%
+    select(src, name, vessel_rnpa, port, economic_unit, datetime, lat, lon, speed, course, year, month) %>%
+    clean_land_points(land = land)
+
+
+
   # Export the file ------------------------------------------------------------
   fwrite(
     x = dt,
@@ -137,7 +161,7 @@ metadata <- tibble(path = paths) %>%
     file = basename(path),
     day_range = str_extract(file, pattern = "[:digit:]+-[:digit:]+"),
     month = str_extract(file, pattern = "[:alpha:]{3}"),
-    year = as.numeric(str_extract(file, pattern = "[:digit:]{4}")),
+    year = as.integer(str_extract(file, pattern = "[:digit:]{4}")),
     month = case_when(
       month == "ENE" ~ "01",
       month == "FEB" ~ "02",

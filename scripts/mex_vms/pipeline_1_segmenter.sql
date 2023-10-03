@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE mex_fisheries.mex_vms_processed_v_20230419
+CREATE OR REPLACE TABLE mex_fisheries.mex_vms_processed_v_20231003
 AS
 WITH all_data AS (
   SELECT
@@ -10,7 +10,7 @@ WITH all_data AS (
   CAST(FLOOR(lat / 0.05) * 0.05 AS NUMERIC) + 0.025 AS lat_center,
   CAST(FLOOR(lon / 0.05) * 0.05 AS NUMERIC) + 0.025 AS lon_center
 FROM
-  `emlab-gcp.mex_fisheries.mex_vms_v_20230419`
+  `emlab-gcp.mex_fisheries.mex_vms_v_20231003`
   WHERE lat IS NOT NULL
   AND lon IS NOT NULL
   AND lat between -90 AND 90
