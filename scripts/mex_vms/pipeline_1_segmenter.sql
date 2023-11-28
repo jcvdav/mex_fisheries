@@ -13,8 +13,8 @@ FROM
   `emlab-gcp.mex_fisheries.mex_vms_v_20231003`
   WHERE lat IS NOT NULL
   AND lon IS NOT NULL
-  AND lat between -90 AND 90
-  AND lon between -180 AND 180
+  AND lat between -30 AND 40
+  AND lon between -180 AND -60
 ),
   #
   #

@@ -7,10 +7,11 @@
 # Section 5 - Lobster concession polygons
 
 # Main targets
-mex_fisheries_data: mex_landings mex_vms mex_vessel_registry spatial_features dag
+mex_fisheries_data: mex_landings mex_vms mex_vessel_registry spatial_features mex_turfs
 mex_landings: data/mex_landings/clean/mex_annual_landings_by_vessel.rds data/mex_landings/clean/mex_monthly_landings_by_vessel.rds data/mex_landings/clean/mex_annual_landings_by_eu.rds data/mex_landings/clean/mex_monthly_landings_by_eu.rds
 mex_vms: data/mex_vms/bq_pipeline.log
 mex_vessel_registry: data/mex_vessel_registry/upload.log
+mex_turfs: data/concesiones/processed/all_spp_permit_and_concessions_polygons.gpkg
 spatial_features: data/spatial_features/upload.log
 dag: workflow.png
 
@@ -70,10 +71,10 @@ data/mex_vessel_registry/clean/large_scale_vessel_registry.csv: scripts/mex_vess
 
 # Section 4: Spatial features ##################################################
 
-data/spatial_features/upload.log: scripts/spatial_features/07_upload_spatial_features.sh data/spatial_features/clean/spatial_features.csv
+data/spatial_features/upload.log: scripts/spatial_features/999_upload_spatial_features.sh data/spatial_features/clean/spatial_features.csv
 		cd $(<D);bash $(<F)
 
-data/spatial_features/clean/spatial_features.csv: scripts/spatial_features/06_combine_spatial_features.R data/spatial_features/clean/*.tif
+data/spatial_features/clean/spatial_features.csv: scripts/spatial_features/99_combine_spatial_features.R data/spatial_features/clean/*.tif
 		cd $(<D);Rscript $(<F)
 
 data/spatial_features/clean/seas_raster.tif seas_dictionary.csv: scripts/spatial_features/01_seas_raster.R data/spatial_features/raw/GOaS_v1_20211214_gpkg/goas_v01.gpkg
@@ -93,13 +94,13 @@ data/spatial_features/clean/depth_raster.tif: scripts/spatial_features/05_depth_
 data/concesiones/processed/all_spp_permit_and_concessions_polygons.gpkg: scripts/concesiones/combine_all_polygons.R data/concesiones/processed/lobster_permit_and_concessions_polygons.gpkg data/concesiones/processed/urchin_permit_and_concessions_polygons.gpkg data/concesiones/processed/cucumber_permit_and_concessions_polygons.gpkg
 		cd $(<D);Rscript $(<F)
 
-data/concesiones/processed/lobster_permit_and_concessions_polygons.gpkg: scripts/concesiones/langosta/04_clean_Nurs_version.R
+data/concesiones/processed/lobster_permit_and_concessions_polygons.gpkg: scripts/concesiones/langosta/03_combine_lobster_polygons.R
 		cd $(<D);Rscript $(<F)
 		
-data/concesiones/processed/urchin_permit_and_concessions_polygons.gpkg:
+data/concesiones/processed/urchin_permit_and_concessions_polygons.gpkg: scripts/concesiones/urchin/01_clean_urchins.R
 		cd $(<D);Rscript $(<F)
 		
-data/concesiones/processed/cucumber_permit_and_concessions_polygons.gpkg:
+data/concesiones/processed/cucumber_permit_and_concessions_polygons.gpkg: scripts/concesiones/pepino/01_clean_sea_cucumber.R
 		cd $(<D);Rscript $(<F)
 # Other components
 

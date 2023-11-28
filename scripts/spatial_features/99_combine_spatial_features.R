@@ -32,7 +32,7 @@ rasters <- rast(files) %>%
 # X ----------------------------------------------------------------------------
 features_df <- rasters %>%
   as.data.frame(xy = T) %>%
-  rename(
+  select(
     lon_center = x,
     lat_center = y,
     sea = seas_raster,
@@ -44,7 +44,6 @@ features_df <- rasters %>%
   mutate(
     lon_center = round(lon_center, 4),
     lat_center = round(lat_center, 4),
-    
     distance_from_port_m = distance_from_port_m * 1e5,
     distance_from_shore_m = distance_from_shore_m * 1e5,
     all_na = (

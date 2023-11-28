@@ -83,10 +83,16 @@ clean_land_points <- function(x, land) {
   return(x)
 }
 
-land <- rnaturalearth::ne_countries(country = c("Mexico"),
-                                    scale = "large",
+mex <- rnaturalearth::ne_countries(scale = "large",
+                                   country = "Mexico",
+                                   returnclass = "sf") 
+
+land <- rnaturalearth::ne_countries(scale = "small",
+                                    continent = c("North America", "Central America", "South America"),
                                     returnclass = "sf") %>% 
-  sf::st_union()
+  filter(!iso_a3 %in% c("MEX", "GRL")) %>% 
+  bind_rows(mex) %>% 
+  st_union()
 
 # Cleaning function 
 clean_vms <- function(data, year, month) {
@@ -112,8 +118,8 @@ clean_vms <- function(data, year, month) {
   # Process the data -----------------------------------------------------------
   dt[, `:=` (
     datetime = to_datetime(datetime),
-    lat = round(x = as.numeric(lat), digits = 4),
-    lon = round(x = as.numeric(lon), digits = 4)
+    lat = round(x = as.numeric(lat), digits = 5),
+    lon = round(x = as.numeric(lon), digits = 5)
   )]
   dt[, vessel_rnpa := fix_rnpa(vessel_rnpa)]
   dt$year <- year
