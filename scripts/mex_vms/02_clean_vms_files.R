@@ -13,23 +13,33 @@
 ## SET UP ######################################################################
 
 # Load packages ----------------------------------------------------------------
-library(here)
-library(janitor)
-library(data.table)
-library(furrr)
-library(sf)
-library(magrittr)
-library(tidyverse)
+pacman::p_load(
+  here,
+  janitor,
+  data.table,
+  furrr,
+  sf,
+  magrittr,
+  tidyverse
+)
 
 source(here("scripts", "00_setup.R"))
 
 # Define functions -------------------------------------------------------------
 # Convert timestmaps to datetimes
 to_datetime <- function(x) {
-  date <- str_extract(x, "[:digit:]+/[:digit:]+/[:digit:]+")
+  # browser()
+  # date <- str_extract(x, "[:digit:]+/[:digit:]+/[:digit:]+")
+  date <- str_extract(x, "[:digit:]+[:punct:][:digit:]+[:punct:][:digit:]+")
+  d1 <- max(str_count(str_extract(date, "[:digit:]+")), na.rm = T) # length of first item
   nas <- is.na(date)
   time <- str_extract(x, "[:digit:]+:[:digit:]+")
-  date <- lubridate::dmy(date)
+  if(d1 == 2){
+    date <- lubridate::dmy(date)
+  }
+  if(d1 == 4){
+    date <-  lubridate::ymd(date)
+  }
   date <- str_replace_all(date, "/", "-")
   datetime <- paste0(date, " ", time, ":00")
   datetime[nas] <- NA
@@ -44,8 +54,8 @@ fix_colnames <- function(file){
   
   current_colnames <- colnames(data)
   
-  fixed_colnames <- case_when(current_colnames %in% c("embarcaci_n", "nombre") ~ "name",
-                              current_colnames %in% c("rnp") ~ "vessel_rnpa",
+  fixed_colnames <- case_when(current_colnames %in% c("embarcaci_n", "nombre", "nombre_embarcacion") ~ "name",
+                              current_colnames %in% c("rnp", "rnpa") ~ "vessel_rnpa",
                               current_colnames %in% c("puerto_base",
                                                       "descripcion",
                                                       "descripcion_3") ~ "port",
@@ -56,7 +66,8 @@ fix_colnames <- function(file){
                                                       "descripcion_2",
                                                       "descripcion_4") ~ "economic_unit",
                               current_colnames %in% c("fecha",
-                                                      "fecha_recepcion_unitrac") ~ "datetime",
+                                                      "fecha_recepcion_unitrac",
+                                                      "ultima_transmision") ~ "datetime",
                               current_colnames %in% c("latitud") ~ "lat",
                               current_colnames %in% c("longitud") ~ "lon",
                               current_colnames %in% c("velocidad") ~ "speed",
@@ -95,7 +106,10 @@ land <- rnaturalearth::ne_countries(scale = "small",
   st_union()
 
 # Cleaning function 
-clean_vms <- function(data, year, month) {
+clean_vms <- function(data) {
+  # browser()
+  year <- unique(data$year)
+  month <- unique(data$month)
   
   # Assign names to each path --------------------------------------------------
   names(data$path) <- data$src
@@ -105,7 +119,7 @@ clean_vms <- function(data, year, month) {
     map(
       path,
       fread,
-      select = 1:9,
+      # select = 1:11, ######### Number of columns to select. Usually 1-9, sometims 1-11
       colClasses = "character",
       na.strings = c("NULL", "NA"),
       blank.lines.skip = TRUE
@@ -151,7 +165,7 @@ paths <-
   list.files(
     path = here("data", "mex_vms", "raw"),
     recursive = T,
-    pattern = "*\\.csv",
+    pattern = "*\\.csv|*\\.CSV",
     full.names = T
   )
 
@@ -197,10 +211,10 @@ plan(multisession, workers = parallel::detectCores() - 2)
 
 # Call cleaning function -------------------------------------------------------
 metadata %>%
+  filter(year == 2023) %>% 
   select(year, month, path, src) %>%
-  nest(data = c(path, src)) %$%
-  future_pwalk(.l = list(data = data, year = year, month = month),
-               .f = clean_vms)
+  group_split(year, month) %>% 
+  future_walk(.f = clean_vms)
 
 plan(sequential)
 

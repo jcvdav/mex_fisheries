@@ -3,7 +3,7 @@
 export PROJECT_PATH="/Users/juancarlosvillasenorderbez/GitHub/data_mex_fisheries/data/"
 
 # Upload all local csv files to GCS Bucket
-gsutil cp "$PROJECT_PATH"mex_vms/clean/*2023_01.csv gs://mex_fisheries/MEX_VMS
+gsutil cp "$PROJECT_PATH"mex_vms/clean/*2023_*.csv gs://mex_fisheries/MEX_VMS
 
 # Create a partitioned table in Big Query
 bq mk --table \
@@ -13,7 +13,7 @@ bq mk --table \
 --description "Mexican VMS data" \
 emlab-gcp:mex_fisheries.mex_vms_v_20231003
 # If I need to delete it, this is the command:
-#bq rm -f -t emlab-gcp:mex_fisheries.mex_vms_v_202301003
+#bq rm -f -t emlab-gcp:mex_fisheries.mex_vms_v_20231003
 
 # Upload from GCS bcket to Big Query table
 bq load \
