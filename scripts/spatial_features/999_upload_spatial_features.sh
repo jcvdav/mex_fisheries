@@ -22,4 +22,4 @@ bq load \
 emlab-gcp:mex_fisheries.spatial_features \
 gs://mex_fisheries/spatial_features.csv
 
-date >> ./data/spatial_features/upload.log
+date >> ../data/spatial_features/upload.log
