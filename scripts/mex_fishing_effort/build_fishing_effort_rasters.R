@@ -33,7 +33,7 @@ connection <- dbConnect(drv = bigquery(),
                         allowLargeResults = TRUE)
 
 mex_vms <- tbl(src = connection,
-               from = "mex_vms_processed_v_20230419")
+               from = "mex_vms_processed_v_20231003")
 
 ## PROCESSING ##################################################################
 
@@ -56,7 +56,7 @@ grided_measures <- mex_vms %>%
 # Collect data
 local_grided_measures <- collect(grided_measures)
 
-# Buidl rasters ----------------------------------------------------------------
+# Build rasters ----------------------------------------------------------------
 # Define function
 wrap_raster <- function(year, data, column){
   name <- paste0("msep_", column, "_", year, ".tif")
