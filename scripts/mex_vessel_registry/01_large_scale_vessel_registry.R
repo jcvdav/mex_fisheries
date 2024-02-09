@@ -174,19 +174,25 @@ ls_assets <- ls_assets_raw %>%
   ) %>%
   distinct() %>%
   mutate(
-    tuna = 1 * str_detect(target_species, "ATÚN"),
+    finfish = 1 * str_detect(target_species, "ESCAMA"),
     sardine = 1 * str_detect(target_species, "SARDINA"),
+    shark = 1 * str_detect(target_species, "TIBURÓN"),
     shrimp = 1 * str_detect(target_species, "CAMARÓN"),
-    others = 1 * (tuna == 0 & sardine == 0 & shrimp == 0),
+    tuna = 1 * str_detect(target_species, "ATÚN"),
+    others = 1 * (finfish == 0 & sardine == 0 & shark == 0 & shrimp == 0 & tuna == 0),
     # vessel_name = furrr::future_map_chr(vessel_name, normalize_shipname),
     sfc_gr_kwh = case_when(
-      vessel_length_m < 12 ~ 240,
-      # Vessels smaller than 12 m have an SFC of 240 gr / kWH
-      between(vessel_length_m, 12, 24) ~ 220,
-      # Vessels between 12 and 24 have an SFC of 220 gr / kWH
-      vessel_length_m > 24 ~ 180
+      vessel_length_m < 12 ~ 240,                                               # Vessels smaller than 12 m have an SFC of 240 gr / kWH
+      between(vessel_length_m, 12, 24) ~ 220,                                   # Vessels between 12 and 24 have an SFC of 220 gr / kWH
+      vessel_length_m > 24 ~ 180                                                # Vessels larger than 24 m have an SFC of 180 gr / kWH
     )
-  ) %>%                                                     # Vessels larger than 24 m have an SFC of 180 gr / kWH
+  ) %>%   
+  replace_na(replace = list(others = 1,
+                            finfish = 0,
+                            sardine = 0,
+                            shark = 0,
+                            shrimp = 0,
+                            tuna = 0)) %>% 
   drop_na(eu_rnpa, vessel_rnpa)
 
 # plan("sequential")
@@ -215,7 +221,8 @@ ls_vessel_registry_clean <- ls_vessel_registry  %>%
   mutate(engine_power_bin_hp = map_dbl(engine_power_hp,                                       # Find the matching bin from the regulation
                                        ~ {
                                          max(engine_power_bins[engine_power_bins <= .x])
-                                       })) %>%
+                                       }),
+         engine_power_kw = 0.7457 * engine_power_hp) %>%
   ungroup() %>%
   select(
     eu_rnpa,
@@ -226,9 +233,11 @@ ls_vessel_registry_clean <- ls_vessel_registry  %>%
     owner_name,
     hull_identifier,
     target_species,
-    tuna,
+    finfish,
     sardine,
+    shark,
     shrimp,
+    tuna,
     others,
     state,
     home_port,
@@ -241,6 +250,7 @@ ls_vessel_registry_clean <- ls_vessel_registry  %>%
     contains("_num"),
     sfc_gr_kwh,
     engine_power_hp,
+    engine_power_kw,
     imputed_engine_power,
     engine_power_bin_hp,
     design_speed_kt,

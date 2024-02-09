@@ -13,10 +13,12 @@
 ## SET UP ######################################################################
 
 # Load packages ----------------------------------------------------------------
-library(here)
-library(janitor)
-library(data.table)
-library(tidyverse)
+pacman::p_load(
+  here,
+  janitor,
+  data.table,
+  tidyverse
+)
 
 # Load and define functions ----------------------------------------------------
 source(here("scripts", "00_setup.R"))

@@ -13,13 +13,13 @@
 ## SET UP ######################################################################
 
 # Load packages ----------------------------------------------------------------
-library(here)
-library(data.table)
-library(readxl)
-library(magrittr)
-library(tidyverse)
-
-# Load data --------------------------------------------------------------------
+pacman::p_load(
+  here,
+  data.table,
+  readxl,
+  magrittr,
+  tidyverse
+)
 
 ## PROCESSING ##################################################################
 # Define read-write function ---------------------------------------------------
@@ -34,7 +34,7 @@ rw <- function(x) {
       "text",
       "text",
       "text",
-      "text",
+      "date",
       "text",
       "text",
       "text",
@@ -63,7 +63,7 @@ rw <- function(x) {
 # Find all excel sheets that need to be converted ------------------------------
 paths <-
   list.files(
-    path = here("data", "mex_vms", "raw"),
+    path = here("data", "mex_vms", "raw", "RLMSEP_2023"),
     recursive = T,
     pattern = "*.xlsx",
     full.names = T

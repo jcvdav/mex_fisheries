@@ -18,6 +18,9 @@ pacman::p_load(
   tidyverse
 )
 
+# Load and define functions ----------------------------------------------------
+source(here("scripts", "00_setup.R"))
+
 # Load data --------------------------------------------------------------------
 stuart <- readRDS(here("data", "mex_landings", "clean", "mex_conapesca_avisos_2000_2019.rds")) %>% 
   filter(year_cut <= 2017)
@@ -30,7 +33,9 @@ months <- tibble(month_cut = c("ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JU
 ## PROCESSING ##################################################################
 
 # Combine and select columns ---------------------------------------------------
-landings <- bind_rows(stuart, apertura, .id = "source") %>% 
+landings <- bind_rows(stuart,
+                      apertura,
+                      .id = "source") %>% 
   left_join(months, by = "month_cut") %>% 
   select(source,
          state,
