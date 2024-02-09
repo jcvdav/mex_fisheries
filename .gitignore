@@ -3,4 +3,10 @@
 .RData
 .Ruserdata
 
-data/
+# Ignore all data
+/data/*
+# Exceptions to the rule (these data are available on GitHub)
+!/data/mex_landings/clean/mex_annual_landings_by_eu.rds
+!/data/mex_landings/clean/mex_annual_landings_by_vessel.rds
+!/data/mex_landings/clean/mex_monthly_landings_by_eu.rds
+!/data/mex_landings/clean/mex_monthly_landings_by_vessel.rds
