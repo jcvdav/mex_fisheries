@@ -4,10 +4,6 @@ This badge shows the DOI for the latest release --> [![DOI](https://zenodo.org/b
 
 This repository contains the code to clean and maintain what I call the `Mexican fisheries data` set. This data set contains tables on Mexico's Vessel Monitoring System (VMS) tracking data, a vessel registry, landings data, and some other things. Data themselves are NOT archived in the repository (due to GitHub's size constraints). But they are available upon request. Please submit an issue or send me an email. I am more than happy to share any and all these data and see them put to a good use. If you want to come up with a way of automating the delivery of the data, please reach out to me. I simply don't have the time.
 
-There is a [Makefile](Makefile) outlining dependencies and order of operations, and the DAG is shown here:
-
-![](workflow.png)
-
 ## 1) Mexican VMS data (2007 - 2023 [partial])
 
 These data are collected and curated by Mexico's [`SISMEP`](https://www.gob.mx/conapesca/acciones-y-programas/sistema-de-monitoreo-satelital-de-embarcaciones-pesqueras) (Sistema de Monitoreo Satelital de Embarcaciones Pesqueras). It reports the geolocation and timestamp of mexican fishing vessels that comply with [Mexico's fisheries regulation](https://www.dof.gob.mx/nota_detalle.php?codigo=5399371&fecha=03/07/2015#gsc.tab=0) on the matter. Simply put, vessels larger than 10m in length overall, with an onboard engine, and with a roof must carry a tansponder.
@@ -72,3 +68,9 @@ _NOTE: For details on the data cleaning, next steps, and know issues, see the de
 - [Distance from shore](https://gmed.auckland.ac.nz/download.html)
 - [Distance from port](https://gmed.auckland.ac.nz/download.html)
 - [Depth](https://gmed.auckland.ac.nz/download.html)
+
+## How do all these pieces come together?
+
+There is a [Makefile](Makefile) outlining dependencies and order of operations, and the DAG is shown here:
+
+![](workflow.png)
