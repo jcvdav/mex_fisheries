@@ -4,9 +4,13 @@
 .Ruserdata
 
 # Ignore all data
-/data/*
+data/*/raw/*
+data/*/processed/*
+data/*/clean/*
+data/Organizational capital_fishing organizations Mex/*
+data/maximum_daily_liters.csv
 # Exceptions to the rule (these data are available on GitHub)
-!/data/mex_landings/clean/mex_annual_landings_by_eu.rds
-!/data/mex_landings/clean/mex_annual_landings_by_vessel.rds
-!/data/mex_landings/clean/mex_monthly_landings_by_eu.rds
-!/data/mex_landings/clean/mex_monthly_landings_by_vessel.rds
+!data/mex_landings/clean/mex_annual_landings_by_eu.rds
+!data/mex_landings/clean/mex_annual_landings_by_vessel.rds
+!data/mex_landings/clean/mex_monthly_landings_by_eu.rds
+!data/mex_landings/clean/mex_monthly_landings_by_vessel.rds
