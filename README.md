@@ -8,7 +8,7 @@ There is a [Makefile](Makefile) outlining dependencies and order of operations, 
 
 ![](workflow.png)
 
-## Mexican VMS data (2007 - 2023 [partial])
+## 1) Mexican VMS data (2007 - 2023 [partial])
 
 These data are collected and curated by Mexico's [`SISMEP`](https://www.gob.mx/conapesca/acciones-y-programas/sistema-de-monitoreo-satelital-de-embarcaciones-pesqueras) (Sistema de Monitoreo Satelital de Embarcaciones Pesqueras). It reports the geolocation and timestamp of mexican fishing vessels that comply with [Mexico's fisheries regulation](https://www.dof.gob.mx/nota_detalle.php?codigo=5399371&fecha=03/07/2015#gsc.tab=0) on the matter. Simply put, vessels larger than 10m in length overall, with an onboard engine, and with a roof must carry a tansponder.
 
@@ -23,7 +23,7 @@ These data are collected and curated by Mexico's [`SISMEP`](https://www.gob.mx/c
 
 _NOTE: For details on the data cleaning, next steps, and know issues, see the dedicated [README](/scripts/vms). File may not be up to date_
 
-## Vessel registry
+## 2) Vessel registry
 
 ### Raw data sources
 
@@ -33,7 +33,7 @@ _NOTE: For details on the data cleaning, next steps, and know issues, see the de
 
 - On Google BigQuery at: `mex-fisheries.mex_vms.svessel_info_v_*`
 
-## Landings data
+## 3) Landings data
 
 ### Raw data sources
 
@@ -51,13 +51,19 @@ _NOTE: For details on the data cleaning, next steps, and know issues, see the de
 - [annual](data/mex_landings/clean/mex_annual_landings_by_vessel.rds)
 - [monthly](data/mex_landings/clean/mex_monthly_landings_by_vessel.rds)
 
-## Subsidy data
+## 4) Subsidy data (coming soon)
 
 ### Sources
 
 ### Availability
 
-## Spatial features
+## 5) Mexican TURFs (coming soon, but see Ere's paper [here](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0286739))
+
+### Sources
+
+### Availability
+
+## 6) Misc spatial features
 
 ### Sources
 
