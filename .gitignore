@@ -4,7 +4,7 @@
 .Ruserdata
 
 # Ignore all data
-data/
+data/*
 # Exceptions to the rule (these data are available on GitHub)
 !data/mex_landings/clean/mex_annual_landings_by_eu.rds
 !data/mex_landings/clean/mex_annual_landings_by_vessel.rds
