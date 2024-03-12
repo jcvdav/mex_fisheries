@@ -2,7 +2,7 @@
 CREATE TEMP FUNCTION
   RADIANS(x FLOAT64) AS ( ACOS(-1) * x / 180 );
 # BEGIN QUERY 
-CREATE OR REPLACE TABLE mex_fisheries.mex_vms_processed_v_20231207 # <---------------- TABLE NAME NEEDS TO BE MANUALLY UPDATED
+CREATE OR REPLACE TABLE `mex-fisheries.mex_vms.mex_vms_processed_v_20240312` # <---------------- TABLE NAME NEEDS TO BE MANUALLY UPDATED
 AS
 WITH all_data AS (
   SELECT
@@ -14,7 +14,7 @@ WITH all_data AS (
   CAST(FLOOR(lat / 0.05) * 0.05 AS NUMERIC) + 0.025 AS lat_center,
   CAST(FLOOR(lon / 0.05) * 0.05 AS NUMERIC) + 0.025 AS lon_center
 FROM
-  `emlab-gcp.mex_fisheries.mex_vms_v_20231003`
+  `mex-fisheries.mex_vms.mex_vms_v_20240204`
   WHERE lat IS NOT NULL
   AND lon IS NOT NULL
   AND lat between -30 AND 40
@@ -96,6 +96,8 @@ SELECT
   lon,
   sea,
   eez,
+  mpa,
+  fishing_region,
   distance_from_port_m,
   distance_from_shore_m,
   depth_m,
@@ -107,4 +109,4 @@ SELECT
   IF(hours >= 24, NULL, hours) AS hours,
   IF(hours >= 24 OR hours = 0, NULL, (distance_to_last_m / 1852) / hours) AS implied_speed_knots
 FROM segmented
-LEFT JOIN `emlab-gcp.mex_fisheries.spatial_features` USING (lon_center, lat_center);
+LEFT JOIN `mex-fisheries.mex_vms.spatial_features_v_20240312` USING (lon_center, lat_center);
