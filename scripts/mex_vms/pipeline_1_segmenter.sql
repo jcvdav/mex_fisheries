@@ -2,7 +2,7 @@
 CREATE TEMP FUNCTION
   RADIANS(x FLOAT64) AS ( ACOS(-1) * x / 180 );
 # BEGIN QUERY 
-CREATE OR REPLACE TABLE `mex-fisheries.mex_vms.mex_vms_processed_v_20240312` # <---------------- TABLE NAME NEEDS TO BE MANUALLY UPDATED
+CREATE OR REPLACE TABLE `mex-fisheries.mex_vms.mex_vms_processed_v_20240515` # <---------------- TABLE NAME NEEDS TO BE MANUALLY UPDATED
 AS
 WITH all_data AS (
   SELECT
@@ -14,7 +14,7 @@ WITH all_data AS (
   CAST(FLOOR(lat / 0.05) * 0.05 AS NUMERIC) + 0.025 AS lat_center,
   CAST(FLOOR(lon / 0.05) * 0.05 AS NUMERIC) + 0.025 AS lon_center
 FROM
-  `mex-fisheries.mex_vms.mex_vms_v_20240204`
+  `mex-fisheries.mex_vms.mex_vms_v_20240515`
   WHERE lat IS NOT NULL
   AND lon IS NOT NULL
   AND lat between -30 AND 40
