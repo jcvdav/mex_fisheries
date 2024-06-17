@@ -18,6 +18,7 @@ pacman::p_load(
   janitor,
   data.table,
   furrr,
+  rnaturalearth,
   sf,
   magrittr,
   tidyverse
@@ -94,13 +95,13 @@ clean_land_points <- function(x, land) {
   return(x)
 }
 
-mex <- rnaturalearth::ne_countries(scale = "large",
-                                   country = "Mexico",
-                                   returnclass = "sf") 
+mex <- ne_countries(scale = "large",
+                    country = "Mexico",
+                    returnclass = "sf") 
 
-land <- rnaturalearth::ne_countries(scale = "small",
-                                    continent = c("North America", "Central America", "South America"),
-                                    returnclass = "sf") %>% 
+land <- ne_countries(scale = "small",
+                     continent = c("North America", "Central America", "South America"),
+                     returnclass = "sf") %>% 
   filter(!iso_a3 %in% c("MEX", "GRL")) %>% 
   bind_rows(mex) %>% 
   st_union()
@@ -121,7 +122,7 @@ clean_vms <- function(data) {
       fread,
       # select = 1:11, ######### Number of columns to select. Usually 1-9, sometims 1-11
       colClasses = "character",
-      na.strings = c("NULL", "NA"),
+      na.strings = c("NULL", "NA", "N/A"),
       blank.lines.skip = TRUE
     ) %>% 
     map(fix_colnames) %>% 
@@ -181,7 +182,7 @@ metadata <- tibble(path = paths) %>%
     file = basename(path),
     day_range = str_extract(file, pattern = "[:digit:]+-[:digit:]+"),
     month = str_extract(file, pattern = "[:alpha:]{3}"),
-    year = as.integer(str_extract(file, pattern = "[:digit:]{4}")),
+    year = as.integer(str_extract(dirname(path), pattern = "[:digit:]{4}")),
     month = case_when(
       month == "ENE" ~ "01",
       month == "FEB" ~ "02",
@@ -211,7 +212,7 @@ plan(multisession, workers = parallel::detectCores() - 2)
 
 # Call cleaning function -------------------------------------------------------
 metadata %>%
-  filter(year == 2023) %>% 
+  # filter(year >= 2024) %>% 
   select(year, month, path, src) %>%
   group_split(year, month) %>% 
   future_walk(.f = clean_vms)

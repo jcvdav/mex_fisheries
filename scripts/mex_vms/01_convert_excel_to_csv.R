@@ -63,7 +63,7 @@ rw <- function(x) {
 # Find all excel sheets that need to be converted ------------------------------
 paths <-
   list.files(
-    path = here("data", "mex_vms", "raw", "RLMSEP_2023"),
+    path = here("data", "mex_vms", "raw"),
     recursive = T,
     pattern = "*.xlsx",
     full.names = T
