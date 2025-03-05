@@ -14,4 +14,5 @@ data/maximum_daily_liters.csv
 !data/mex_landings/clean/mex_annual_landings_by_vessel.rds
 !data/mex_landings/clean/mex_monthly_landings_by_eu.rds
 !data/mex_landings/clean/mex_monthly_landings_by_vessel.rds
+!data/mex_landings/clean/mex_landings_2000_2022.rds
 !data/concesiones/processed/all_spp_permit_and_concessions_polygons.gpkg
