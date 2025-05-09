@@ -107,56 +107,63 @@ land <- ne_countries(scale = "small",
   st_union()
 
 # Cleaning function 
-clean_vms <- function(data) {
+clean_vms <- function(data, out_dir = here("data/mex_vms/clean")) {
   # browser()
+  # Checks ---------------------------------------------------------------------
+  # Check that directory exists
+  if(!dir.exists(out_dir)) {
+    print(paste("Directory", out_dir, "not found, creating one..."))
+    dir.create(out_dir)
+  }
+  
+  # Extract file name parts
   year <- unique(data$year)
   month <- unique(data$month)
+  out_file <- here(out_dir, paste0("MEX_VMS_", year, "_", month, ".csv"))
   
-  # Assign names to each path --------------------------------------------------
-  names(data$path) <- data$src
-  
-  # Read in --------------------------------------------------------------------
-  dt <- data %$%
-    map(
-      path,
-      fread,
-      # select = 1:11, ######### Number of columns to select. Usually 1-9, sometims 1-11
-      colClasses = "character",
-      na.strings = c("NULL", "NA", "N/A"),
-      blank.lines.skip = TRUE
-    ) %>% 
-    map(fix_colnames) %>% 
-    bind_rows(.id = "src")
-  
-  setkey(dt, vessel_rnpa)
-  
-  # Process the data -----------------------------------------------------------
-  dt[, `:=` (
-    datetime = to_datetime(datetime),
-    lat = round(x = as.numeric(lat), digits = 5),
-    lon = round(x = as.numeric(lon), digits = 5)
-  )]
-  dt[, vessel_rnpa := fix_rnpa(vessel_rnpa)]
-  dt$year <- year
-  dt$month <- as.numeric(month)
-  
-  
-  dt <- dt %>%
-    select(src, name, vessel_rnpa, port, economic_unit, datetime, lat, lon, speed, course, year, month) %>%
-    clean_land_points(land = land)
-
-
-
-  # Export the file ------------------------------------------------------------
-  fwrite(
-    x = dt,
-    file = here(
-      "data",
-      "mex_vms",
-      "clean",
-      paste0("MEX_VMS_", year, "_", month, ".csv")
+  if(!file.exists(out_file)) {
+    
+    
+    # Assign names to each path --------------------------------------------------
+    names(data$path) <- data$src
+    
+    # Read in --------------------------------------------------------------------
+    dt <- data %$%
+      map(
+        path,
+        fread,
+        # select = 1:11, ######### Number of columns to select. Usually 1-9, sometims 1-11
+        colClasses = "character",
+        na.strings = c("NULL", "NA", "N/A"),
+        blank.lines.skip = TRUE
+      ) %>% 
+      map(fix_colnames) %>% 
+      bind_rows(.id = "src")
+    
+    setkey(dt, vessel_rnpa)
+    
+    # Process the data -----------------------------------------------------------
+    dt[, `:=` (
+      datetime = to_datetime(datetime),
+      lat = round(x = as.numeric(lat), digits = 5),
+      lon = round(x = as.numeric(lon), digits = 5)
+    )]
+    dt[, vessel_rnpa := fix_rnpa(vessel_rnpa)]
+    dt$year <- year
+    dt$month <- as.numeric(month)
+    
+    
+    dt <- dt %>%
+      select(src, name, vessel_rnpa, port, economic_unit, datetime, lat, lon, speed, course, year, month) %>%
+      clean_land_points(land = land)
+    
+    
+    # Export the file ------------------------------------------------------------
+    fwrite(
+      x = dt,
+      file = out_file
     )
-  )
+  } else {print(paste("Skipping", basename(out_file), "because it already exists..."))}
 }
 
 ## PROCESSING ##################################################################
@@ -212,7 +219,6 @@ plan(multisession, workers = parallel::detectCores() - 2)
 
 # Call cleaning function -------------------------------------------------------
 metadata %>%
-  # filter(year >= 2024) %>% 
   select(year, month, path, src) %>%
   group_split(year, month) %>% 
   future_walk(.f = clean_vms)

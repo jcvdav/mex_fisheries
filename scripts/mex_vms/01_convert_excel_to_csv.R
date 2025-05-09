@@ -25,8 +25,9 @@ pacman::p_load(
 # Define read-write function ---------------------------------------------------
 rw <- function(x) {
   new_file <- str_replace_all(x, "xlsx", "csv")
-
-  data <- read_excel(
+  
+  if(!file.exists(new_file)) {
+    data <- read_excel(
     path = x,
     sheet = 1,
     col_types = c(
@@ -56,8 +57,12 @@ rw <- function(x) {
   
   fwrite(x = data, file = new_file, na = "NULL")
   
+  
+  } else {print(paste("File", basename(new_file), "already exists, skipping..."))}
+  
   log_path <- here("data", "mex_vms", "raw", "xls_to_csv_logs.log")
   system(paste("date >>", log_path))
+
 }
 
 # Find all excel sheets that need to be converted ------------------------------
@@ -70,4 +75,4 @@ paths <-
   )
 
 # Execute
-walk(paths, rw)
+walk(paths, safely(rw))

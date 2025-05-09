@@ -9,9 +9,12 @@ data/*/processed/*
 data/*/clean/*
 data/Organizational capital_fishing organizations Mex/*
 data/maximum_daily_liters.csv
+*.zip
 # Exceptions to the rule (these data are available on GitHub)
 !data/mex_landings/clean/mex_annual_landings_by_eu.rds
 !data/mex_landings/clean/mex_annual_landings_by_vessel.rds
 !data/mex_landings/clean/mex_monthly_landings_by_eu.rds
 !data/mex_landings/clean/mex_monthly_landings_by_vessel.rds
+!data/mex_landings/clean/mex_landings_2000_2022.rds
 !data/concesiones/processed/all_spp_permit_and_concessions_polygons.gpkg
+!data/mex_vms/raw/**/

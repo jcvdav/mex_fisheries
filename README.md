@@ -17,7 +17,7 @@ These data are collected and curated by Mexico's [`SISMEP`](https://www.gob.mx/c
 - L1 data: On Google Cloud storage at: `gs://mex_fisheries/MEX_VMS/*` with monthly `*.csv` files.
 - L1 and L2 data: On Google BigQuery at: `mex-fisheries.mex_vms.mex_vms_*` as a partitioned table (by year) and some level of processing
 
-_NOTE: For details on the data cleaning, next steps, and know issues, see the dedicated [README](/scripts/vms). File may not be up to date_
+_NOTE: For details on the data cleaning, next steps, and know issues, see the dedicated [README](/scripts/mex_vms). File may not be up to date_
 
 ## 2) Vessel registry
 
