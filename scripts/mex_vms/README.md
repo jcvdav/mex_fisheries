@@ -3,7 +3,7 @@
 Data soruce:
 - "Localización Y Monitoreo Satelital De Embarcaciones Pesqueras" publicado por CONAPESCA. Consultado en [https://datos.gob.mx/busca/dataset/localizacion-y-monitoreo-satelital-de-embarcaciones-pesqueras](https://datos.gob.mx/busca/dataset/localizacion-y-monitoreo-satelital-de-embarcaciones-pesqueras) el 2023-03-23.
 
-Metadata:
+Metadata original:
 
 ```
 Nombre: Nombre de la embarcación

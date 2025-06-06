@@ -2,11 +2,42 @@
 
 This badge shows the DOI for the latest release --> [![DOI](https://zenodo.org/badge/362593818.svg)](https://doi.org/10.5281/zenodo.10641018)
 
-This repository contains the code to clean and maintain what I call the `Mexican fisheries data` set. This data set contains tables on Mexico's Vessel Monitoring System (VMS) tracking data, a vessel registry, landings data, and some other things. Data themselves are NOT archived in the repository (due to GitHub's size constraints). But they are available upon request. Please submit an issue or send me an email. I am more than happy to share any and all these data and see them put to a good use. If you want to come up with a way of automating the delivery of the data, please reach out to me. I simply don't have the time.
+This repository contains the code to clean and maintain what I call the `Mexican fisheries data` set. This data set contains tables on Mexico's Vessel Monitoring System (VMS) tracking data, a vessel registry, landings data, and some other things. Data themselves are NOT archived in the repository (due to GitHub's size constraints). But they are available upon request. Please submit an issue or send me an email. **I am more than happy to share any and all these data and see them put to a good use**. If you want to come up with a way of automating the delivery of the data, please reach out to me. I simply don't have the time.
 
 ## 1) Mexican VMS data (2007 - 2024 [partial])
 
-These data are collected and curated by Mexico's [`SISMEP`](https://www.gob.mx/conapesca/acciones-y-programas/sistema-de-monitoreo-satelital-de-embarcaciones-pesqueras) (Sistema de Monitoreo Satelital de Embarcaciones Pesqueras). It reports the geolocation and timestamp of mexican fishing vessels that comply with [Mexico's fisheries regulation](https://www.dof.gob.mx/nota_detalle.php?codigo=5399371&fecha=03/07/2015#gsc.tab=0) on the matter. Simply put, vessels larger than 10.5m in length overall, with an onboard engine > 80hp, and with a roof must carry a tansponder.
+These data are collected and curated by Mexico's [`SISMEP`](https://www.gob.mx/conapesca/acciones-y-programas/sistema-de-monitoreo-satelital-de-embarcaciones-pesqueras) (Sistema de Monitoreo Satelital de Embarcaciones Pesqueras). It reports the geolocation and timestamp of mexican fishing vessels that comply with [Mexico's fisheries regulation](https://www.dof.gob.mx/nota_detalle.php?codigo=5399371&fecha=03/07/2015#gsc.tab=0) on the matter. Simply put, vessels larger than 10.5m in length overall, with an on-board engine > 80hp, and with a roof must carry a transponder.
+
+The data are hosted on GooglBigQuery at `mex-fisheries.mex_vms.mex_vms_processed_v_YYYYMMDD`. If you have a Google Cloud account, send me your email and I will grant you read access.
+Once you have access, you can query them using BigQuery (SQL) or via R. The following code snippet shows how you might connect to the database.
+
+```
+# Load packages ----------------------------------------------------------------
+pacman::p_load(
+  bigrquery,
+  DBI,
+  tidyverse
+)
+
+bq_auth("juancarlos.villader@gmail.com") # You'll need to authenticate using your own email
+
+# Establish a connection -------------------------------------------------------
+con <- dbConnect(bigquery(),
+                 project = "mex-fisheries", # This is the name of the project, leave it as-is
+                 dataset = "mex_vms",       # This is the name of the dataset, leave it as-is
+                 billing = "your-billing-id-here", # And this is the blling. You will need to use yours here.
+                 use_legacy_sql = FALSE, 
+                 allowLargeResults = TRUE)
+  
+mex_vms <- tbl(con, "mex_vms_processed_v_20250319") # This object now contains a tbl that points at mex_vms_processed_v_20250319
+
+# That's it, you can now use dplyr verbs to work with the data.
+# For example, get latitude, longitude, and vessel id for the first 1000 rows in the data
+mex_vms |> 
+    select(vessel_rnpa, lat, lon) |> 
+    head(1000) |> 
+    collect()
+```
 
 ### Raw sources
 
