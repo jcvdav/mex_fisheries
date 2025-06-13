@@ -145,8 +145,8 @@ clean_vms <- function(data, out_dir = here("data/mex_vms/clean")) {
     # Process the data -----------------------------------------------------------
     dt[, `:=` (
       datetime = to_datetime(datetime),
-      lat = round(x = as.numeric(lat), digits = 5),
-      lon = round(x = as.numeric(lon), digits = 5)
+      lat = round(x = as.numeric(str_replace(lat, ",", "\\.")), digits = 5),
+      lon = round(x = as.numeric(str_replace(lon, ",", "\\.")), digits = 5)
     )]
     dt[, vessel_rnpa := fix_rnpa(vessel_rnpa)]
     dt$year <- year

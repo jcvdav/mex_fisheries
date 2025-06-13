@@ -11,7 +11,7 @@ bq mk --table \
 --time_partitioning_field datetime \
 --time_partitioning_type YEAR \
 --description "Mexican VMS data" \
-mex-fisheries:mex_vms.mex_vms_v_20250319
+mex-fisheries:mex_vms.mex_vms_v_20250613
 # If I need to delete it, this is the command:
 #bq rm -f -t emlab-gcp:mex_fisheries.mex_vms_v_20231003
 
@@ -20,7 +20,7 @@ bq load \
 --source_format=CSV \
 --skip_leading_rows=1 \
 --replace \
-mex-fisheries:mex_vms.mex_vms_v_20250319 \
+mex-fisheries:mex_vms.mex_vms_v_20250613 \
 "gs://mex_vms/MEX_VMS/MEX_VMS*.csv"
 
 # Save breadcrumb
