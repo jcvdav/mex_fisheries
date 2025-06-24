@@ -3,7 +3,7 @@
 export PROJECT_PATH="/Users/jcvd/GitHub/mex_fisheries/data/"
 
 # Upload all local csv files to GCS Bucket
-gsutil cp "$PROJECT_PATH"mex_vms/clean/*2024*.csv gs://mex_vms/MEX_VMS
+gsutil cp "$PROJECT_PATH"mex_vms/clean/*202{4,5}*.csv gs://mex_vms/MEX_VMS
 
 # Create a partitioned table in Big Query
 bq mk --table \
@@ -11,18 +11,18 @@ bq mk --table \
 --time_partitioning_field datetime \
 --time_partitioning_type YEAR \
 --description "Mexican VMS data" \
-mex-fisheries:mex_vms.mex_vms_v_20250613
+mex-fisheries:mex_vms.mex_vms_v_20250623
 # If I need to delete it, this is the command:
-#bq rm -f -t emlab-gcp:mex_fisheries.mex_vms_v_20231003
+#bq rm -f -t emlab-gcp:mex_fisheries.mex_vms_v_20250623
 
 # Upload from GCS bcket to Big Query table
 bq load \
 --source_format=CSV \
 --skip_leading_rows=1 \
 --replace \
-mex-fisheries:mex_vms.mex_vms_v_20250613 \
+mex-fisheries:mex_vms.mex_vms_v_20250623 \
 "gs://mex_vms/MEX_VMS/MEX_VMS*.csv"
 
 # Save breadcrumb
-date >> ./data/mex_vms/upload.log
+date >> ../../data/mex_vms/upload.log
 
