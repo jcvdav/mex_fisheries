@@ -4,12 +4,26 @@ This badge shows the DOI for the latest release --> [![DOI](https://zenodo.org/b
 
 This repository contains the code to clean and maintain what I call the `Mexican fisheries data` set. This data set contains tables on Mexico's Vessel Monitoring System (VMS) tracking data, a vessel registry, landings data, and some other things. Data themselves are NOT archived in the repository (due to GitHub's size constraints). But they are available upon request. Please submit an issue or send me an email. **I am more than happy to share any and all these data and see them put to a good use**. If you want to come up with a way of automating the delivery of the data, please reach out to me. I simply don't have the time.
 
-## 1) Mexican VMS data (2007 - 2024 [partial])
+## 1) Mexican VMS data (2007 - 2025 [partial])
 
-These data are collected and curated by Mexico's [`SISMEP`](https://www.gob.mx/conapesca/acciones-y-programas/sistema-de-monitoreo-satelital-de-embarcaciones-pesqueras) (Sistema de Monitoreo Satelital de Embarcaciones Pesqueras). It reports the geolocation and timestamp of mexican fishing vessels that comply with [Mexico's fisheries regulation](https://www.dof.gob.mx/nota_detalle.php?codigo=5399371&fecha=03/07/2015#gsc.tab=0) on the matter. Simply put, vessels larger than 10.5m in length overall, with an on-board engine > 80hp, and with a roof must carry a transponder.
+### Raw sources
 
-The data are hosted on GooglBigQuery at `mex-fisheries.mex_vms.mex_vms_processed_v_YYYYMMDD`. If you have a Google Cloud account, send me your email and I will grant you read access.
-Once you have access, you can query them using BigQuery (SQL) or via R. The following code snippet shows how you might connect to the database.
+- [Datos abiertos](https://datos.gob.mx/busca/dataset/localizacion-y-monitoreo-satelital-de-embarcaciones-pesqueras): These data are collected and curated by Mexico's [`SISMEP`](https://www.gob.mx/conapesca/acciones-y-programas/sistema-de-monitoreo-satelital-de-embarcaciones-pesqueras) (Sistema de Monitoreo Satelital de Embarcaciones Pesqueras). It reports the geolocation and timestamp of mexican fishing vessels that comply with [Mexico's fisheries regulation](https://www.dof.gob.mx/nota_detalle.php?codigo=5399371&fecha=03/07/2015#gsc.tab=0) on the matter. Simply put, vessels larger than 10.5m in length overall, with an on-board engine > 80hp, and with a roof must carry a transponder.
+
+### "Clean" data vailability, with two different levels of processing
+
+- L1 data (not recommended): Monthly CSV files are available in the `data/mex_vms/clean/` and on Google Cloud storage at: `gs://mex_fisheries/MEX_VMS/*`
+- L1 and L2 data (recommended): On Google BigQuery at: `mex-fisheries.mex_vms.mex_vms_latest`, as a partitioned table (by year) and some level of processing with added features.
+
+Note that BigQuery data use a standard versioning system every time the tables undergo a major change, like fixing bugs, adding data, or modifying the underlying cleaning code. Past versions include:
+
+- `mex-fisheries.mex_vms.mex_vms_processed_v_20240515`
+- `mex-fisheries.mex_vms.mex_vms_processed_v_20240615`
+- `mex-fisheries.mex_vms.mex_vms_processed_v_20240319`
+- `mex-fisheries.mex_vms.mex_vms_processed_v_20240613`
+- `mex-fisheries.mex_vms.mex_vms_processed_v_20240623`
+
+You should be able to access the entire date set using BigQuery (SQL) or R. The following code snippet shows how you might connect to the database:
 
 ```
 # Load packages ----------------------------------------------------------------
@@ -29,7 +43,7 @@ con <- dbConnect(bigquery(),
                  use_legacy_sql = FALSE, 
                  allowLargeResults = TRUE)
   
-mex_vms <- tbl(con, "mex_vms_processed_v_20250319") # This object now contains a tbl that points at mex_vms_processed_v_20250319
+mex_vms <- tbl(con, "mex_vms_processed_latest") # This object now contains a tbl that points at mex_vms_processed_v_20250319
 
 # That's it, you can now use dplyr verbs to work with the data.
 # For example, get latitude, longitude, and vessel id for the first 1000 rows in the data
@@ -38,15 +52,6 @@ mex_vms |>
     head(1000) |> 
     collect()
 ```
-
-### Raw sources
-
-- [Datos abiertos](https://datos.gob.mx/busca/dataset/localizacion-y-monitoreo-satelital-de-embarcaciones-pesqueras)
-
-### "Clean" data vailability, with two different levels of processing (Email me for access)
-
-- L1 data: On Google Cloud storage at: `gs://mex_fisheries/MEX_VMS/*` with monthly `*.csv` files.
-- L1 and L2 data: On Google BigQuery at: `mex-fisheries.mex_vms.mex_vms_*` as a partitioned table (by year) and some level of processing
 
 _NOTE: For details on the data cleaning, next steps, and know issues, see the dedicated [README](/scripts/mex_vms). File may not be up to date_
 
@@ -58,9 +63,9 @@ _NOTE: For details on the data cleaning, next steps, and know issues, see the de
 
 ### "Clean" data availability
 
-- On Google BigQuery at: `mex-fisheries.mex_vms.svessel_info_v_*`
+- On Google BigQuery at: `mex-fisheries.mex_vms.vessel_info_v_*`
 
-## 3) Landings data
+## 3) Landings data [~2001-2022]
 
 ### Raw data sources
 

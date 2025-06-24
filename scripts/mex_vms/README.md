@@ -31,3 +31,8 @@ Regulation governing the use of VMS on boats:
 ### Clean data issues
 - For data from `21-31-AGO-2014.csv`, `11-20-ENE-2018.csv`, `16-31 OCT 2020.csv`, there is no datetime available. There is, however, year and month data available, extracted from the file names (included as an `src` variable).
 - Vessel names have not been normalized yet. But, the vessel names in the vessel registry are already normalized, and matching on `vessel_rnpa` is recommended instead.
+
+
+## How to
+
+The data are hosted 

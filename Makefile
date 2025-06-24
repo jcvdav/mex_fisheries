@@ -40,7 +40,7 @@ data/mex_landings/clean/mex_conapesca_avisos_2000_2019.rds: scripts/mex_landings
 # Section 2: Vessel monitoring data ############################################
 
 # Execute BigQuery pipeline
-data/mex_vms/bq_pipeline.log: scripts/mex_vms/04_bigquery_pipeline.sh data/mex_vms/upload.log scripts/mex_vms/pipeline_1_segmenter.sql scripts/mex_vms/pipeline_2_segment_info.sql data/spatial_features/upload.log
+data/mex_vms/bq_pipeline.log: scripts/mex_vms/04_bigquery_pipeline.sh data/mex_vms/upload.log scripts/mex_vms/pipeline_1_segmenter.sql scripts/mex_vms/pipeline_2_segment_info.sql
 		cd $(<D);bash $(<F)
 
 # Upload to BigQuery

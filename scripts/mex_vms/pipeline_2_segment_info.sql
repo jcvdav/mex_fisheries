@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE `mex-fisheries.mex_vms.segment_info_v_20250613`
+CREATE OR REPLACE TABLE `mex-fisheries.mex_vms.segment_info_v_20250623`
 AS
 SELECT
   seg_id,
@@ -16,6 +16,6 @@ SELECT
   AVG(implied_speed_knots) AS average_implied_speed_knotts,
   MIN(year) AS year_start,
   MAX(year) AS year_end
-FROM `mex-fisheries.mex_vms.mex_vms_processed_v_20250613`
+FROM `mex-fisheries.mex_vms.mex_vms_processed_v_20250623`
   GROUP BY seg_id
   ORDER BY seg_id;
