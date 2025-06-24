@@ -18,4 +18,4 @@ data/maximum_daily_liters.csv
 !data/mex_landings/clean/mex_landings_2000_2022.rds
 !data/concesiones/processed/all_spp_permit_and_concessions_polygons.gpkg
 !data/mex_vms/raw/**/
-!data/mex_vms/clean/**/
+!data/mex_vms/clean/
