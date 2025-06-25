@@ -1,7 +1,5 @@
 ## Use git LFS to track these files
 # VMS data
-data/mex_vms/raw/* filter=lfs diff=lfs merge=lfs -text
-data/mex_vms/raw/** filter=lfs diff=lfs merge=lfs -text
 data/mex_vms/clean/* filter=lfs diff=lfs merge=lfs -text
 data/mex_vms/clean/** filter=lfs diff=lfs merge=lfs -text
 # Landings data
@@ -10,3 +8,4 @@ data/mex_landings/raw/datos_abiertos filter=lfs diff=lfs merge=lfs -text
 data/mex_landings/raw/CONAPESCA filter=lfs diff=lfs merge=lfs -text
 data/mex_landings/raw/CONAPESCA[[:space:]]Avisos[[:space:]]2000-2019.zip filter=lfs diff=lfs merge=lfs -text
 data/mex_landings/clean/mex_landings_2000_2022.rds filter=lfs diff=lfs merge=lfs -text
+data/mex_landings/raw/CONAPESCA_Avisos_2000-2019/*.csv filter=lfs diff=lfs merge=lfs -text
