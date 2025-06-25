@@ -44,7 +44,7 @@ col.names = c("vessel_rnpa", "vessel_name",
               "coastline")
 
 # Load data --------------------------------------------------------------------
-files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA_apertura"),
+files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA"),
                     pattern = "*\\.xlsx",
                     full.names = T)
 
