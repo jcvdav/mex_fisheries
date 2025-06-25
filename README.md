@@ -2,7 +2,11 @@
 
 This badge shows the DOI for the latest release --> [![DOI](https://zenodo.org/badge/362593818.svg)](https://doi.org/10.5281/zenodo.10641018)
 
-This repository contains the code to clean and maintain what I call the `Mexican fisheries data` set. This data set contains tables on Mexico's Vessel Monitoring System (VMS) tracking data, a vessel registry, landings data, and some other things. Data themselves are NOT archived in the repository (due to GitHub's size constraints). But they are available upon request. Please submit an issue or send me an email. **I am more than happy to share any and all these data and see them put to a good use**. If you want to come up with a way of automating the delivery of the data, please reach out to me. I simply don't have the time.
+This repository contains the code to clean and maintain what I call the `Mexican fisheries data` set. This data set contains tables on Mexico's Vessel Monitoring System (VMS) tracking data, a vessel registry, landings data, and some other things. Data themselves are NOT archived in the repository due to GitHub's size constraints. I am using [`git-lfs`](https://git-lfs.com/), which you will have to install if you want to clone or fork the repository.
+
+**I am more than happy to share any and all these data and see them put to a good use**. If you want to come up with a way of automating the delivery of the data, please reach out to me. I simply don't have the time.
+
+Please submit an issue or send me an email if you encounter any issues. 
 
 ## 1) Mexican VMS data (2007 - 2025 [partial])
 
