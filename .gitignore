@@ -17,8 +17,8 @@ data/maximum_daily_liters.csv
 !data/mex_vms/clean/*
 
 # Mex lanmdings data
-!data/mex_landings/raw**/*.csv
-!data/mex_landings/raw**/*.xlsx
+!data/mex_landings/raw**
+!data/mex_landings/raw**
 !data/mex_landings/clean/mex_annual_landings_by_eu.rds
 !data/mex_landings/clean/mex_annual_landings_by_vessel.rds
 !data/mex_landings/clean/mex_monthly_landings_by_eu.rds
