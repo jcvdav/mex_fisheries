@@ -47,7 +47,7 @@ col.names = c("vessel_rnpa", "vessel_name",
 files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA"),
                     pattern = "*\\.xlsx",
                     full.names = T)
-
+#modify how files are read
 landings_ls <- map_dfr(files, readxl::read_excel, col_types = "text", sheet = "AVISOS DE ARRIBO MAYORES") %>% 
   janitor::clean_names() %>% 
   mutate(fleet = "large_scale")
