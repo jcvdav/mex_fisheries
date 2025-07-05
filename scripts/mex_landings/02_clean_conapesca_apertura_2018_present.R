@@ -111,7 +111,8 @@ landings_clean <- landings %>%
                                        acuaculture_production == "NO" ~ "NO",
                                        T ~ NA_character_),
     eu_rnpa = fix_rnpa(eu_rnpa, length = 10),
-    vessel_rnpa = fix_rnpa(vessel_rnpa))
+    vessel_rnpa = fix_rnpa(vessel_rnpa)) %>% 
+  filter(!is.na(year_cut))
 
 ## EXPORT ######################################################################
 
