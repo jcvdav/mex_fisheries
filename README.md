@@ -1,7 +1,8 @@
 # Mexican Fisheries Data
 
-Latest release: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15733839.svg)](https://doi.org/10.5281/zenodo.15733839)
-Cite all versions? You can cite all versions by using the DOI 10.5281/zenodo.10641018. This DOI represents all versions, and will always resolve to the latest one.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15733839.svg)](https://doi.org/10.5281/zenodo.15733839)
+
+Use the DOI link provided above to cite this version (recommended). You can cite all versions by using the DOI 10.5281/zenodo.10641018. This DOI represents all versions, and will always resolve to the latest one.
 
 This repository contains the code to clean and maintain what I call the `Mexican fisheries data` set. This data set contains tables on Mexico's Vessel Monitoring System (VMS) tracking data, a vessel registry, landings data, and some other things. Data themselves are NOT archived in the repository due to GitHub's size constraints. I am using [`git-lfs`](https://git-lfs.com/), which you will have to install if you want to clone or fork the repository.
 
