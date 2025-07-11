@@ -74,13 +74,19 @@ landings_clean <- landings %>%
     landed_weight = as.numeric(str_replace_all(landed_weight, "[^0-9.]", "")),
     live_weight = as.numeric(str_replace_all(live_weight, "[^0-9.]", "")),
     value = as.numeric(str_replace_all(value, "[^0-9.]", "")),
-    year_cut = as.numeric(str_replace_all(year_cut, "[^0-9]", ""))
+    year_cut = as.numeric(str_replace_all(year_cut, "[^0-9]", "")),
+    
+    fleet = case_when(receipt_type == "MAYORES" ~ "large_scale",
+                      receipt_type == "MENORES" ~ "small_scale",
+                      T ~ NA)
   ) %>% 
   select(
     state,
     office_name,
+    fleet,
     vessel_rnpa,
     vessel_name,
+    landing_site_key,
     landing_site,
     eu_rnpa,
     economic_unit,
