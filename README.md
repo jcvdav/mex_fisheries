@@ -1,6 +1,8 @@
 # Mexican Fisheries Data
 
-This badge shows the DOI for the latest release --> [![DOI](https://zenodo.org/badge/362593818.svg)](https://doi.org/10.5281/zenodo.10641018)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15733839.svg)](https://doi.org/10.5281/zenodo.15733839)
+
+Use the DOI link provided above to cite this version (recommended). You can cite all versions by using the DOI 10.5281/zenodo.10641018. This DOI represents all versions, and will always resolve to the latest one.
 
 This repository contains the code to clean and maintain what I call the `Mexican fisheries data` set. This data set contains tables on Mexico's Vessel Monitoring System (VMS) tracking data, a vessel registry, landings data, and some other things. Data themselves are NOT archived in the repository due to GitHub's size constraints. I am using [`git-lfs`](https://git-lfs.com/), which you will have to install if you want to clone or fork the repository.
 
@@ -21,11 +23,11 @@ Please submit an issue or send me an email if you encounter any issues.
 
 Note that BigQuery data use a standard versioning system every time the tables undergo a major change, like fixing bugs, adding data, or modifying the underlying cleaning code. Past versions include:
 
-- `mex-fisheries.mex_vms.mex_vms_processed_v_20240515`
+- `mex-fisheries.mex_vms.mex_vms_processed_v_20250623` <-- This is the current version, viewed by `mex-fisheries.mex_vms.mex_vms_latest`
+- `mex-fisheries.mex_vms.mex_vms_processed_v_20250613`
+- `mex-fisheries.mex_vms.mex_vms_processed_v_20250319`
 - `mex-fisheries.mex_vms.mex_vms_processed_v_20240615`
-- `mex-fisheries.mex_vms.mex_vms_processed_v_20240319`
-- `mex-fisheries.mex_vms.mex_vms_processed_v_20240613`
-- `mex-fisheries.mex_vms.mex_vms_processed_v_20240623`
+- `mex-fisheries.mex_vms.mex_vms_processed_v_20240515`
 
 You should be able to access the entire date set using BigQuery (SQL) or R. The following code snippet shows how you might connect to the database:
 

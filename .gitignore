@@ -4,7 +4,6 @@
 .Ruserdata
 .DS_Store
 
-
 # Ignore all data
 data/*/raw/*
 data/*/processed/*
@@ -29,3 +28,7 @@ data/maximum_daily_liters.csv
 
 # TURFs
 !data/concesiones/processed/all_spp_permit_and_concessions_polygons.gpkg
+
+# Vessel registry
+!data/mex_vessel_registry/raw/**/
+!data/mex_vessel_registry/clean/
