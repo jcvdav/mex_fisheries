@@ -18,7 +18,8 @@
 pacman::p_load(
   here,
   readxl,
-  tidyverse
+  tidyverse,
+  stringi
 )
 
 # Load and define functions ----------------------------------------------------
@@ -34,7 +35,7 @@ col.names = c("vessel_rnpa", "vessel_name",
               "fishing_site_name", "n_vessels",
               "month_cut", "year_cut",
               "period_start", "period_end",
-              "period_length", "period_effective_dates",
+              "period_length", "period_effective_days",
               "fishing_zone_type", "acuaculture_production",
               "permit_number", "permit_issue_date",
               "permit_expiration_date", "main_species_group",
@@ -45,69 +46,82 @@ col.names = c("vessel_rnpa", "vessel_name",
 
 # Load data --------------------------------------------------------------------
 files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA"),
-                    pattern = "*\\.xlsx",
+                    pattern = "*\\.csv",
                     full.names = T)
-
-landings_ls <- map_dfr(files, readxl::read_excel, col_types = "text", sheet = "AVISOS DE ARRIBO MAYORES") %>% 
-  janitor::clean_names() %>% 
-  mutate(fleet = "large_scale")
-landings_ss <- map_dfr(files, readxl::read_excel, col_types = "text", sheet = "AVISOS DE ARRIBO MENORES") %>% 
-  janitor::clean_names() %>% 
-  mutate(fleet = "small_scale")
+# Read files--------------------------------------------------------------------
+landings <- map_dfr(
+  files, 
+    ~readr::read_csv(
+      .x,
+      col_types = cols(.default = "c"), 
+      col_names = col.names, 
+      skip = 3, 
+      locale = locale(encoding = "UTF-8")
+    )
+) %>% 
+  janitor::clean_names() 
 
 ## PROCESSING ##################################################################
 
 # Rename and filter ------------------------------------------------------------
-landings_clean <- rbind(landings_ls,
-                        landings_ss) %>% 
+landings_clean <- landings %>% 
   mutate(
-    landed_weight = coalesce(peso_desembarcado_kg, peso_desembarcado),
-    live_weight = coalesce(peso_vivo_kg, peso_vivo),
-    price = coalesce(precio_por_kilogramo_pesos, precio),
-    value = coalesce(valor_pesos, valor),
-    landed_weight = as.numeric(landed_weight),
-    live_weight = as.numeric(live_weight),
-    value = as.numeric(value)) %>% 
+    vessel_rnpa = stri_enc_toutf8(vessel_rnpa),
+    eu_rnpa = stri_enc_toutf8(eu_rnpa),
+    vessel_rnpa = stri_replace_all_regex(vessel_rnpa, "[^\\p{L}\\p{N}]", ""),
+    eu_rnpa = stri_replace_all_regex(eu_rnpa, "[^\\p{L}\\p{N}]", ""),
+    
+    landed_weight = as.numeric(str_replace_all(landed_weight, "[^0-9.]", "")),
+    live_weight = as.numeric(str_replace_all(live_weight, "[^0-9.]", "")),
+    value = as.numeric(str_replace_all(value, "[^0-9.]", "")),
+    year_cut = as.numeric(str_replace_all(year_cut, "[^0-9]", "")),
+    
+    fleet = case_when(receipt_type == "MAYORES" ~ "large_scale",
+                      receipt_type == "MENORES" ~ "small_scale",
+                      T ~ NA)
+  ) %>% 
   select(
-    state = nombre_estado,
-    office_name = nombre_oficina,
+    state,
+    office_name,
     fleet,
-    vessel_rnpa = rnp_activo,
-    vessel_name = nombre_activo,
-    landing_site = nombre_sitio_desembarque,
-    eu_rnpa = rnpa_unidad_economica,
-    economic_unit = unidad_economica,
-    origin = origen,
-    fishing_site_name = nombre_lugarcaptura,
-    n_vessels = numero_embarcaciones,
-    month_cut = mes_corte,
-    year_cut = ano_corte,
-    period_start = periodo_inicio,
-    period_end = periodo_fin,
-    period_length = duracion,
-    period_effective_days = dias_efectivos,
-    fishing_zone_type = tipo_zona,
-    acuaculture_production = produccion_acuacultural,
-    permit_number = numero_permiso,
-    permit_issue_date = fecha_expedicion,
-    permit_expiration_date = fecha_vigencia,
-    main_species_group = nombre_principal,
-    species_key = clave_especie,
-    species_name = nombre_especie,
+    vessel_rnpa,
+    vessel_name,
+    landing_site_key,
+    landing_site,
+    eu_rnpa,
+    economic_unit,
+    origin,
+    fishing_site_name,
+    n_vessels,
+    month_cut,
+    year_cut,
+    period_start,
+    period_end,
+    period_length,
+    period_effective_days,
+    fishing_zone_type,
+    acuaculture_production,
+    permit_number,
+    permit_issue_date,
+    permit_expiration_date,
+    main_species_group,
+    species_key,
+    species_name,
     landed_weight,
     live_weight,
     price,
-    value) %>% 
+    value ) %>% 
   mutate(
     year_cut = as.numeric(year_cut),
     acuaculture_production = case_when(acuaculture_production == "SÃ\u008d" ~ "SÍ",
                                        acuaculture_production == "NO" ~ "NO",
                                        T ~ NA_character_),
     eu_rnpa = fix_rnpa(eu_rnpa, length = 10),
-    vessel_rnpa = fix_rnpa(vessel_rnpa))
+    vessel_rnpa = fix_rnpa(vessel_rnpa)) %>% 
+  filter(!is.na(year_cut))
 
 ## EXPORT ######################################################################
 
 # Export file  000--------------------------------------------------------------
 saveRDS(object = landings_clean,
-        file = here("data", "mex_landings", "clean", "mex_conapesca_apertura_2018_2022.rds"))
+        file = here("data", "mex_landings", "clean", "mex_conapesca_apertura_2018_present.rds"))
