@@ -17,10 +17,10 @@ source(here("scripts", "00_setup.R"))
 
 
 ## Load data  ###############################################################################################################################################
-# Maximum daily liters for each engine size and fuel type
+ #Maximum daily liters for each engine size and fuel type
 #mdl_raw <-
- # read_csv(here("data", "maximum_daily_liters.csv")) %>%
- # filter(fuel_type == "diesel")
+  #read_csv(here("data", "maximum_daily_liters.csv")) %>%
+  #filter(fuel_type == "diesel")
 
 # The data are in an excel file, which contains three worksheets
 excel_data_file <-
@@ -28,13 +28,14 @@ excel_data_file <-
     "data",
     "mex_vessel_registry",
     "raw",
-    "conapesca",
-    "Rep_Emb_may_2025.xlsx"
+    "ANEXO-DGPPE-147220",
+    "ANEXO SISI 147220 - EmbarcacionesMayores.xlsx"
   )
 
 # List of assets are on sheet 1
 ls_assets_raw <- read_excel(
   path = excel_data_file,
+  skip = 6,
   sheet = 1,
   col_types = c(
     "skip",
@@ -53,6 +54,9 @@ ls_assets_raw <- read_excel(
     "text",
     "text",
     "text",
+    "text",
+    "text",
+    "text",
     "numeric",
     "numeric",
     "numeric",
@@ -69,6 +73,7 @@ ls_assets_raw <- read_excel(
     "numeric",
     "numeric",
     "numeric",
+    "text",
     "text",
     "text",
     "text"
@@ -76,11 +81,11 @@ ls_assets_raw <- read_excel(
 )
 
 # List of large-scale vessel engines are on sheet 2
-#vessel_engines_ls_raw <- read_excel(
- # path = excel_data_file,
- # sheet = 2,
-  #col_types = c("skip", "text", "text", "text", "text", "numeric", "text")
-#)
+vessel_engines_ls_raw <- read_excel(
+  path = excel_data_file,
+  sheet = 2,
+  col_types = c("skip", "text", "text", "text", "text", "numeric", "text")
+)
 
 # Define a unique vector of engine power bins
 #engine_power_bins <-
@@ -93,26 +98,26 @@ ls_assets_raw <- read_excel(
 # the values stored in them are also converted into English
 
 # Vessel engines
-#vessel_engines <- vessel_engines_ls_raw %>%
-  #clean_names() %>%                                                                      # Clean column names
-  #rename(
-    ## Start renaming columns we'll keep
-    #vessel_rnpa = rnpa_emb_mayor,
-    #brand = marca,
-    #model = modelo,
-    #serial_number = serie,
-    #engine_power_hp = potencia,
-    #main_engine = principal
-  #) %>%
-  #mutate(main_engine = main_engine == "SI") %>%
-  #mutate_at(vars(brand, model), str_fix) %>%                                             # Fix all string variables
-  #select(vessel_rnpa,
-   #       engine_power_hp,
-   #       brand,
-   #       model) %>%
-  #drop_na(vessel_rnpa) %>%
-  #distinct() %>%
-  #mutate(engine_power_hp = ifelse(engine_power_hp < 15, NA_real_, engine_power_hp))
+vessel_engines <- vessel_engines_ls_raw %>%
+  clean_names() %>%                                                                      # Clean column names
+  rename(
+    # Start renaming columns we'll keep
+    vessel_rnpa = rnpa_emb_mayor,
+    brand = marca,
+    model = modelo,
+    serial_number = serie,
+    engine_power_hp = potencia,
+    main_engine = principal
+  ) %>%
+  mutate(main_engine = main_engine == "SI") %>%
+  mutate_at(vars(brand, model), str_fix) %>%                                             # Fix all string variables
+  select(vessel_rnpa,
+          engine_power_hp,
+          brand,
+          model) %>%
+  drop_na(vessel_rnpa) %>%
+  distinct() %>%
+  mutate(engine_power_hp = ifelse(engine_power_hp < 15, NA_real_, engine_power_hp))
 
 # Clean assets
 # plan("multisession")                   # It's faster to run in parallel
@@ -121,13 +126,13 @@ ls_assets <- ls_assets_raw %>%
   clean_names() %>%                   # Clean column names
   rename(
     # Start renming columns we'll keep
-    #eu_rnpa = rnpa,
-    #economic_unit = unidad_economica,
-    vessel_rnpa = rnpa,
+    eu_rnpa = rnpa_8,
+    economic_unit = unidad_economica,
+    vessel_rnpa = rnpa_10,
     vessel_name = activo,
     vessel_type = uso,
-    #owner_rnpa = rnpa_13,
-    #owner_name = propietario,
+    owner_rnpa = rnpa_13,
+    owner_name = propietario,
     hull_identifier = matricula,
     state = entidad,
     home_port = puerto,
@@ -149,12 +154,12 @@ ls_assets <- ls_assets_raw %>%
   ) %>%                                                    ### REVIEW SPECIES ASSIGNMENT (TO BETTER-MATCH DPC)
   # filter(estatus == "ACTIVO") %>%
   select(
-    #eu_rnpa,
-    #economic_unit,
+    eu_rnpa,
+    economic_unit,
     vessel_rnpa,
     vessel_name,
-    #owner_rnpa,
-    #owner_name,
+    owner_rnpa,
+    owner_name,
     hull_identifier,
     target_species,
     state,
@@ -174,7 +179,7 @@ ls_assets <- ls_assets_raw %>%
     shark = 1 * str_detect(target_species, "TIBURÓN"),
     shrimp = 1 * str_detect(target_species, "CAMARÓN"),
     tuna = 1 * str_detect(target_species, "ATÚN"),
-    others = 1 * (finfish == 0 & sardine == 0 & shark == 0 & shrimp == 0 & tuna == 0),
+    other_species = 1 * (finfish == 0 & sardine == 0 & shark == 0 & shrimp == 0 & tuna == 0),
     trawler = 1 * str_detect(gear_type, "ARRASTRE"),
     purse_seine = 1 * str_detect(gear_type, "CERCO"),
     longline = 1 * str_detect(gear_type, "PALANGRE"),
@@ -186,83 +191,87 @@ ls_assets <- ls_assets_raw %>%
       vessel_length_m > 24 ~ 180                                                # Vessels larger than 24 m have an SFC of 180 gr / kWH
     )
   ) %>%   
-  replace_na(replace = list(others = 1,
+  replace_na(replace = list(other_species = 1,
                             finfish = 0,
                             sardine = 0,
                             shark = 0,
                             shrimp = 0,
-                            tuna = 0)) 
-  #drop_na(eu_rnpa)
+                            tuna = 0)) %>% 
+  drop_na(eu_rnpa, vessel_rnpa)
 
 # plan("sequential")
 
 ## Combine tables  ###############################################################################################################################################
-#ls_vessel_registry <-
-  #ls_assets %>%                      # Take the assets table
-  #left_join(vessel_engines, by = "vessel_rnpa") %>%      # And add its engine info
-  #filter(between(vessel_length_m, 10.5, 100)) %>%
-  #mutate(fuel_type = "Diesel",
-         #fleet = "large scale")
+ls_vessel_registry <-
+  ls_assets %>%                      # Take the assets table
+  left_join(vessel_engines, by = "vessel_rnpa") %>%      # And add its engine info
+  filter(between(vessel_length_m, 10.5, 100)) %>%
+  mutate(fuel_type = "Diesel",
+         fleet = "large scale")
 
-#engine_power_model <-
-  #lm(log(engine_power_hp) ~ log(vessel_length_m) + shrimp + tuna + sardine + others,
-     #data = ls_vessel_registry)
+engine_power_model <-
+  lm(log(engine_power_hp) ~ log(vessel_length_m) + shrimp + tuna + sardine + other_species,
+     data = ls_vessel_registry)
 
-#ls_vessel_registry_clean <- ls_vessel_registry  %>%
-  #mutate(
-    #imputed_engine_power = is.na(engine_power_hp),
-    #new_hp = exp(predict(engine_power_model, newdata = .)),
-    #engine_power_hp = coalesce(engine_power_hp, new_hp),
-    #design_speed_kt = design_speed(engine_power_hp)
-  #) %>%                             # Calculate the engine's design speed
-  #select(-new_hp) %>%
-  #group_by(vessel_rnpa) %>%                                                              # Group by vessel and engine type
-  #mutate(engine_power_bin_hp = map_dbl(engine_power_hp,                                       # Find the matching bin from the regulation
-   #                                    ~ {
-    #                                     max(engine_power_bins[engine_power_bins <= .x])
-     #                                  }),
-         #engine_power_kw = 0.7457 * engine_power_hp) %>%
- # ungroup() %>%
-  #select(
-    #eu_rnpa,
-    #economic_unit,
-   # vessel_rnpa,
-  #  vessel_name,
-    #owner_rnpa,
-    #owner_name,
-   # hull_identifier,
-  #  target_species,
-   # finfish,
-  #  sardine,
-   # shark,
-  #  shrimp,
-  #  tuna,
-   # others,
-  #  state,
-   # home_port,
-  #  construction_year,
-   # hull_material,
-  #  preservation_system,
-   # gear_type,
-  #  detection_gear,
-   # contains("vessel_"),
-  #  contains("_num"),
-   # sfc_gr_kwh,
-    #engine_power_hp,
+ls_vessel_registry_clean <- ls_vessel_registry  %>%
+  mutate(
+    imputed_engine_power = is.na(engine_power_hp),
+    new_hp = exp(predict(engine_power_model, newdata = .)),
+    engine_power_hp = coalesce(engine_power_hp, new_hp),
+    design_speed_kt = design_speed(engine_power_hp)
+  ) %>%                             # Calculate the engine's design speed
+  select(-new_hp) %>%
+  group_by(vessel_rnpa) %>%                                                              # Group by vessel and engine type
+ #mutate(#engine_power_bin_hp = map_dbl(engine_power_hp,                                       # Find the matching bin from the regulation
+                                      # ~ {
+                                       #  max(engine_power_bins[engine_power_bins <= .x])
+                                      # }),
+        # engine_power_kw = 0.7457 * engine_power_hp) %>%
+  ungroup() %>%
+  select(
+    eu_rnpa,
+    economic_unit,
+    vessel_rnpa,
+    vessel_name,
+    owner_rnpa,
+    owner_name,
+    hull_identifier,
+    target_species,
+    finfish,
+    sardine,
+    shark,
+    shrimp,
+    tuna,
+    other_species,
+    state,
+    home_port,
+    construction_year,
+    hull_material,
+    preservation_system,
+    gear_type,
+    trawler,
+    purse_seine,
+    longline,
+    other_gear,
+    detection_gear,
+    contains("vessel_"),
+    contains("_num"),
+    sfc_gr_kwh,
+    engine_power_hp,
     #engine_power_kw,
-    #imputed_engine_power,
+    imputed_engine_power,
     #engine_power_bin_hp,
-    #design_speed_kt,
-    #brand,
-    #model,
-  #  fuel_type,
-  #  fleet
-  #) %>%
-  #group_by(vessel_rnpa) %>%
-  #mutate(n = n()) %>%
-  #ungroup() %>%
-  #filter(n == 1) %>%
-  #select(-n)
+    design_speed_kt,
+    brand,
+    model,
+    fuel_type,
+    fleet
+  ) %>%
+  group_by(vessel_rnpa) %>%
+  mutate(n = n()) %>%
+  ungroup() %>%
+  filter(n == 1) %>%
+  select(-n)
 
 
 
