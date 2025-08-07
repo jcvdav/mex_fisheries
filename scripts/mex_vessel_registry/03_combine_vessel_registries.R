@@ -22,7 +22,7 @@ files <-
   )
 
 vessel_registry <- map_dfr(files,
-                           fread) %>%
+                           readRDS) %>%
   rename(eu_name = economic_unit) %>% 
   mutate(vessel_rnpa = fix_rnpa(vessel_rnpa),
          eu_name = clean_eu_names(eu_name),
