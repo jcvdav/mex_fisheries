@@ -17,10 +17,6 @@ source(here("scripts", "00_setup.R"))
 
 
 ## Load data  ###############################################################################################################################################
- #Maximum daily liters for each engine size and fuel type
-#mdl_raw <-
-  #read_csv(here("data", "maximum_daily_liters.csv")) %>%
-  #filter(fuel_type == "diesel")
 
 # The data are in an excel file, which contains three worksheets
 excel_data_file <-
@@ -86,10 +82,6 @@ vessel_engines_ls_raw <- read_excel(
   sheet = 2,
   col_types = c("skip", "text", "text", "text", "text", "numeric", "text")
 )
-
-# Define a unique vector of engine power bins
-#engine_power_bins <-
-  #c(0, unique(mdl_raw$engine_power_hp))                            # We add a 0 for those engines < smallest category
 
 ## Selections  ###############################################################################################################################################
 # In this section we select the columns we wish to keep
@@ -222,11 +214,6 @@ ls_vessel_registry_clean <- ls_vessel_registry  %>%
   ) %>%                             # Calculate the engine's design speed
   select(-new_hp) %>%
   group_by(vessel_rnpa) %>%                                                              # Group by vessel and engine type
- #mutate(#engine_power_bin_hp = map_dbl(engine_power_hp,                                       # Find the matching bin from the regulation
-                                      # ~ {
-                                       #  max(engine_power_bins[engine_power_bins <= .x])
-                                      # }),
-        # engine_power_kw = 0.7457 * engine_power_hp) %>%
   ungroup() %>%
   select(
     eu_rnpa,
@@ -258,9 +245,7 @@ ls_vessel_registry_clean <- ls_vessel_registry  %>%
     contains("_num"),
     sfc_gr_kwh,
     engine_power_hp,
-    #engine_power_kw,
     imputed_engine_power,
-    #engine_power_bin_hp,
     design_speed_kt,
     brand,
     model,
