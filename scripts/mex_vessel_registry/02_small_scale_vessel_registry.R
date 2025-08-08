@@ -136,7 +136,7 @@ ss_vessel_registry <- ss_assets_raw %>%
 
 ## Export data  ###############################################################################################################################################
 
-# Save csv for gogole cloud bucket
+# Save rds for gogole cloud bucket
 saveRDS(ss_vessel_registry,
   file = here(
     "data",
