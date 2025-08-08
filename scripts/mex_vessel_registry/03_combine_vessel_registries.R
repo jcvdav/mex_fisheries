@@ -28,7 +28,7 @@ vessel_registry <- map_dfr(files,
          eu_name = clean_eu_names(eu_name),
          eu_rnpa = fix_rnpa(eu_rnpa, 10)) %>%
   distinct() %>%
-  select(-target_species)
+  select(-target_species, -gear_type)
 
 fwrite(
   x = vessel_registry,
