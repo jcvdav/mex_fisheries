@@ -32,3 +32,5 @@ data/maximum_daily_liters.csv
 # Vessel registry
 !data/mex_vessel_registry/raw/**/
 !data/mex_vessel_registry/clean/
+!data/mex_vessel_registry/clean/*.rds
+!data/mex_vessel_registry/clean/*.md
