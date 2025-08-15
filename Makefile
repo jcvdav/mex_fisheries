@@ -29,7 +29,7 @@ data/mex_landings/clean/mex_landings_2000_2022.rds: scripts/mex_landings/03_comb
 
 # DATA CLEANING ----------------------------------------------------------------
 # Landings from CONAPESCA
-data/mex_landings/clean/mex_conapesca_apertura_2018_2022.rds: scripts/mex_landings/02_clean_conapesca_apertura_2018_2022.R data/mex_landings/raw/CONAPESCA/*.xlsx
+data/mex_landings/clean/mex_conapesca_apertura_2018_2022.rds: scripts/mex_landings/02_clean_conapesca_apertura_2018_present.R data/mex_landings/raw/CONAPESCA/*.xlsx
 		cd $(<D);Rscript $(<F)
 
 # Landings from Stuart
@@ -58,15 +58,15 @@ data/mex_vms/raw/xls_to_csv_logs.log: scripts/mex_vms/01_convert_excel_to_csv.R
 # Section 3: Vessel registry ####################################################
 
 data/mex_vessel_registry/upload.log: scripts/mex_vessel_registry/04_upload_registry_files.sh data/mex_vessel_registry/clean/complete_vessel_registry.csv
-		cd $(<D);bash $(<F)
+		bash $(<D)$(<F)
 
-data/mex_vessel_registry/clean/complete_vessel_registry.csv: scripts/mex_vessel_registry/03_combine_vessel_registries.R data/mex_vessel_registry/clean/large_scale_vessel_registry.csv data/mex_vessel_registry/clean/small_scale_vessel_registry.csv
+data/mex_vessel_registry/clean/complete_vessel_registry.csv: scripts/mex_vessel_registry/03_combine_vessel_registries.R data/mex_vessel_registry/clean/large_scale_vessel_registry.rds data/mex_vessel_registry/clean/small_scale_vessel_registry.rds
 		cd $(<D);Rscript $(<F)
 	
-data/mex_vessel_registry/clean/small_scale_vessel_registry.csv: scripts/mex_vessel_registry/02_small_scale_vessel_registry.R
+data/mex_vessel_registry/clean/small_scale_vessel_registry.rds: scripts/mex_vessel_registry/02_small_scale_vessel_registry.R
 		cd $(<D);Rscript $(<F)
 	
-data/mex_vessel_registry/clean/large_scale_vessel_registry.csv: scripts/mex_vessel_registry/01_large_scale_vessel_registry.R
+data/mex_vessel_registry/clean/large_scale_vessel_registry.rds: scripts/mex_vessel_registry/01_large_scale_vessel_registry.R
 		cd $(<D);Rscript $(<F)
 
 # Section 4: Spatial features ##################################################
