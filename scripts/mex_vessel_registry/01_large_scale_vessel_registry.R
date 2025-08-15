@@ -9,7 +9,6 @@ library(here)
 library(startR)
 library(janitor)
 library(readxl)
-library(furrr)
 library(tidyverse)
 
 # Load functions -
@@ -90,8 +89,8 @@ vessel_engines_ls_raw <- read_excel(
 # the values stored in them are also converted into English
 
 # Vessel engines
-vessel_engines <- vessel_engines_ls_raw %>%
-  clean_names() %>%                                                                      # Clean column names
+vessel_engines <- vessel_engines_ls_raw |>
+  clean_names() |>                                                                      # Clean column names
   rename(
     # Start renaming columns we'll keep
     vessel_rnpa = rnpa_emb_mayor,
@@ -100,24 +99,40 @@ vessel_engines <- vessel_engines_ls_raw %>%
     serial_number = serie,
     engine_power_hp = potencia,
     main_engine = principal
-  ) %>%
-  mutate(main_engine = main_engine == "SI") %>%
-  mutate_at(vars(brand, model), str_fix) %>%                                             # Fix all string variables
+  ) |>
+  drop_na(vessel_rnpa, engine_power_hp) |>
+  mutate(engine_type = ifelse(main_engine == "SI", "main", "auxiliary")) |>
+  mutate_at(vars(brand, model), str_fix) |>                                             # Fix all string variables
   select(vessel_rnpa,
-          engine_power_hp,
-          brand,
-          model) %>%
-  drop_na(vessel_rnpa) %>%
-  distinct() %>%
-  mutate(engine_power_hp = ifelse(engine_power_hp < 15, NA_real_, engine_power_hp))
+         engine_type,
+         engine_power_hp,
+         brand,
+         model) |>
+  mutate(engine_power_hp = ifelse(engine_power_hp < 15, NA_real_, engine_power_hp)) |> 
+  distinct() |>
+  # IF it has more than one auxiliary or more than one main, we add their total power
+  group_by(vessel_rnpa,
+           engine_type) |> 
+  summarize(engine_power_hp = sum(engine_power_hp),
+            n_engines = n(),
+            .groups = "drop") |> 
+  pivot_wider(names_from = engine_type,
+              values_from = c(engine_power_hp, n_engines),
+              names_glue = "{engine_type}_{.value}") |> 
+  select(vessel_rnpa,
+         main_engines_n = main_n_engines,
+         main_engine_power_hp,
+         auxiliary_engines_n = auxiliary_n_engines,
+         auxiliary_engine_power_hp) |> 
+  replace_na(replace = list(main_engines_n = 0,
+                            auxiliary_engines_n = 0)) |> 
+  mutate(auxiliary_engine_power_hp = ifelse(auxiliary_engines_n == 0, 0, auxiliary_engine_power_hp))
 
 # Clean assets
-# plan("multisession")                   # It's faster to run in parallel
-
-ls_assets <- ls_assets_raw %>%
-  clean_names() %>%                   # Clean column names
+ls_assets <- ls_assets_raw |> 
+  clean_names() |>                    # Clean column names
   rename(
-    # Start renming columns we'll keep
+    # Start renaming columns we'll keep
     eu_rnpa = rnpa_8,
     economic_unit = unidad_economica,
     vessel_rnpa = rnpa_10,
@@ -143,8 +158,9 @@ ls_assets <- ls_assets_raw %>%
     vessel_draft_m = calado,
     vessel_gross_tonnage = cap_carga,
     detection_gear = equipo_deteccion
-  ) %>%                                                    ### REVIEW SPECIES ASSIGNMENT (TO BETTER-MATCH DPC)
-  # filter(estatus == "ACTIVO") %>%
+  ) |> 
+  drop_na(eu_rnpa, vessel_rnpa) |> 
+  # filter(estatus == "ACTIVO") |>
   select(
     eu_rnpa,
     economic_unit,
@@ -163,58 +179,40 @@ ls_assets <- ls_assets_raw %>%
     detection_gear,
     contains("vessel_"),
     contains("_num")
-  ) %>%
-  distinct() %>%
+  ) |>
+  distinct() |>
   mutate(
-    finfish = 1 * str_detect(target_species, "ESCAMA"),
-    sardine = 1 * str_detect(target_species, "SARDINA"),
-    shark = 1 * str_detect(target_species, "TIBURÓN"),
-    shrimp = 1 * str_detect(target_species, "CAMARÓN"),
-    tuna = 1 * str_detect(target_species, "ATÚN"),
-    other_species = 1 * (finfish == 0 & sardine == 0 & shark == 0 & shrimp == 0 & tuna == 0),
-    trawler = 1 * str_detect(gear_type, "ARRASTRE"),
-    purse_seine = 1 * str_detect(gear_type, "CERCO"),
-    longline = 1 * str_detect(gear_type, "PALANGRE"),
-    other_gear = 1 * (trawler == 0 & purse_seine == 0 & longline == 0),
-    # vessel_name = furrr::future_map_chr(vessel_name, normalize_shipname),
-    sfc_gr_kwh = case_when(
-      vessel_length_m < 12 ~ 240,                                               # Vessels smaller than 12 m have an SFC of 240 gr / kWH
-      between(vessel_length_m, 12, 24) ~ 220,                                   # Vessels between 12 and 24 have an SFC of 220 gr / kWH
-      vessel_length_m > 24 ~ 180                                                # Vessels larger than 24 m have an SFC of 180 gr / kWH
-    )
-  ) %>%   
-  replace_na(replace = list(other_species = 1,
-                            finfish = 0,
-                            sardine = 0,
-                            shark = 0,
-                            shrimp = 0,
-                            tuna = 0)) %>% 
-  drop_na(eu_rnpa, vessel_rnpa)
+    # Target species
+    target_finfish = 1 * str_detect(target_species, "ESCAMA"),
+    target_sardine = 1 * str_detect(target_species, "SARDINA"),
+    target_shark = 1 * str_detect(target_species, "TIBURÓN"),
+    target_shrimp = 1 * str_detect(target_species, "CAMARÓN"),
+    target_tuna = 1 * str_detect(target_species, "ATÚN"),
+    target_other = 1 * (target_finfish == 0 & target_sardine == 0 & target_shark == 0 & target_shrimp == 0 & target_tuna == 0),
+    # Gears employed
+    gear_trawler = 1 * str_detect(gear_type, "ARRASTRE"),
+    gear_purse_seine = 1 * str_detect(gear_type, "CERCO"),
+    gear_longline = 1 * str_detect(gear_type, "PALANGRE"),
+    gear_other = 1 * (gear_trawler == 0 & gear_purse_seine == 0 & gear_longline == 0),
+    # There are three vessels that are > 250 m (2480 2595, and 16076). I suspect these are errors in units, but will need to be made NA for now
+    # Similarly, there are 27 vessels with length = 0, so we'll make those NAs.
+    vessel_length_m = case_when(vessel_length_m > 250 ~ NA_real_,
+                                vessel_length_m == 0 ~ NA_real_,
+                                T ~ vessel_length_m)
+  )
+  
 
 # plan("sequential")
 
 ## Combine tables  ###############################################################################################################################################
 ls_vessel_registry <-
-  ls_assets %>%                      # Take the assets table
-  left_join(vessel_engines, by = "vessel_rnpa") %>%      # And add its engine info
-  filter(between(vessel_length_m, 10.5, 100)) %>%
+  ls_assets |>                      # Take the assets table
+  left_join(vessel_engines, by = "vessel_rnpa") |>      # And add its engine info
+  # filter(between(vessel_length_m, 5, 100)) |>
   mutate(fuel_type = "Diesel",
          fleet = "large scale")
 
-engine_power_model <-
-  lm(log(engine_power_hp) ~ log(vessel_length_m) + shrimp + tuna + sardine + other_species,
-     data = ls_vessel_registry)
-
-ls_vessel_registry_clean <- ls_vessel_registry  %>%
-  mutate(
-    imputed_engine_power = is.na(engine_power_hp),
-    new_hp = exp(predict(engine_power_model, newdata = .)),
-    engine_power_hp = coalesce(engine_power_hp, new_hp),
-    design_speed_kt = design_speed(engine_power_hp)
-  ) %>%                             # Calculate the engine's design speed
-  select(-new_hp) %>%
-  group_by(vessel_rnpa) %>%                                                              # Group by vessel and engine type
-  ungroup() %>%
+ls_vessel_registry_clean <- ls_vessel_registry  |>
   select(
     eu_rnpa,
     economic_unit,
@@ -223,40 +221,23 @@ ls_vessel_registry_clean <- ls_vessel_registry  %>%
     owner_rnpa,
     owner_name,
     hull_identifier,
-    target_species,
-    finfish,
-    sardine,
-    shark,
-    shrimp,
-    tuna,
-    other_species,
+    contains("target_"),
+    contains("gear_"),
     state,
     home_port,
     construction_year,
     hull_material,
     preservation_system,
-    gear_type,
-    trawler,
-    purse_seine,
-    longline,
-    other_gear,
     detection_gear,
     contains("vessel_"),
     contains("_num"),
-    sfc_gr_kwh,
-    engine_power_hp,
-    imputed_engine_power,
-    design_speed_kt,
-    brand,
-    model,
+    main_engines_n,
+    main_engine_power_hp,
+    auxiliary_engines_n,
+    auxiliary_engine_power_hp,
     fuel_type,
     fleet
-  ) %>%
-  group_by(vessel_rnpa) %>%
-  mutate(n = n()) %>%
-  ungroup() %>%
-  filter(n == 1) %>%
-  select(-n)
+  )
 
 
 
