@@ -9,7 +9,6 @@ library(here)
 library(startR)
 library(janitor)
 library(readxl)
-library(furrr)
 library(tidyverse)
 
 source(here("scripts", "00_setup.R"))
@@ -86,27 +85,18 @@ ss_vessel_registry <- ss_assets_raw %>%
     vessel_length_m = eslora,
     vessel_gross_tonnage = cap_carga,
     fuel_type = combustible,
-    brand = marca,
-    model = modelo,
     serial_number = serie,
-    engine_power_hp = potencia
+    main_engine_power_hp = potencia
   ) %>%
   distinct() %>%
-  mutate_at(vars(brand, model), str_fix) %>%                                                    # Fix all string variables for engines
   mutate(
     fuel_type = case_when(
       fuel_type == "GASOLINA" ~ "Gasoline",
       fuel_type == "DIESEL" ~ "Diesel",
       T ~ NA_character_
-    ),
-    design_speed_kt = design_speed(engine_power_hp),
-    # Calculate the engine's design speed
-    # vessel_name = furrr::future_map_chr(vessel_name, normalize_shipname),
-    sfc_gr_kwh = 240
-  ) %>%                                                     #
-  filter(engine_power_hp > 0) %>%
-  drop_na(eu_rnpa, vessel_rnpa, engine_power_hp) %>%
-  mutate(engine_power_kw = 0.7457 * engine_power_hp) %>% 
+    )) %>%                                                     #
+  filter(main_engine_power_hp > 0) %>%
+  drop_na(eu_rnpa, vessel_rnpa, main_engine_power_hp) %>%
   select(
     eu_rnpa,
     economic_unit,
@@ -117,11 +107,7 @@ ss_vessel_registry <- ss_assets_raw %>%
     hull_identifier,
     hull_material,
     contains("vessel_"),
-    engine_power_hp,
-    engine_power_kw,
-    design_speed_kt,
-    brand,
-    model,
+    main_engine_power_hp,
     fuel_type
   ) %>%
   mutate(fleet = "small scale") %>%
