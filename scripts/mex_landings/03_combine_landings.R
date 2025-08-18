@@ -25,7 +25,7 @@ source(here("scripts", "00_setup.R"))
 stuart <- readRDS(here("data", "mex_landings", "clean", "mex_conapesca_avisos_2000_2019.rds")) %>% 
   filter(year_cut <= 2017)
        
-apertura <- readRDS(here("data", "mex_landings", "clean", "mex_conapesca_apertura_2018_2022.rds"))
+apertura <- readRDS(here("data", "mex_landings", "clean", "mex_conapesca_apertura_2018_present.rds"))
 
 months <- tibble(month_cut = c("ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"),
                  month = 1:12) 
@@ -34,14 +34,15 @@ months <- tibble(month_cut = c("ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JU
 
 # Combine and select columns ---------------------------------------------------
 landings <- bind_rows(stuart,
-                      apertura,
-                      .id = "source") %>% 
+                      apertura) %>% 
   left_join(months, by = "month_cut") %>% 
-  select(source,
-         state,
+  select(state,
          office_name,
+         landing_site,
          year = year_cut,
          month = month,
+         period_start,
+         period_end,
          eu_rnpa,
          eu_name = economic_unit,
          fleet,
@@ -58,4 +59,4 @@ landings <- bind_rows(stuart,
 
 # Export file ------------------------------------------------------------------
 saveRDS(object = landings,
-        file = here("data", "mex_landings", "clean", "mex_landings_2000_2022.rds"))
+        file = here("data", "mex_landings", "clean", "mex_landings_2000_present.rds"))
