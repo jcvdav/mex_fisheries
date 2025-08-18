@@ -24,12 +24,12 @@ data/mex_landings/clean/mex_annual_landings_by_vessel.rds data/mex_landings/clea
 
 # COMBINING --------------------------------------------------------------------
 # Combine both data sets
-data/mex_landings/clean/mex_landings_2000_2022.rds: scripts/mex_landings/03_combine_landings.R data/mex_landings/clean/mex_conapesca_avisos_2000_2019.rds data/mex_landings/clean/mex_conapesca_apertura_2018_2022.rds
+data/mex_landings/clean/mex_landings_2000_present.rds: scripts/mex_landings/03_combine_landings.R data/mex_landings/clean/mex_conapesca_avisos_2000_2019.rds data/mex_landings/clean/mex_conapesca_apertura_2018_present.rds
 		cd $(<D);Rscript $(<F)
 
 # DATA CLEANING ----------------------------------------------------------------
 # Landings from CONAPESCA
-data/mex_landings/clean/mex_conapesca_apertura_2018_2022.rds: scripts/mex_landings/02_clean_conapesca_apertura_2018_present.R data/mex_landings/raw/CONAPESCA/*.xlsx
+data/mex_landings/clean/mex_conapesca_apertura_2018_present.rds: scripts/mex_landings/02_clean_conapesca_apertura_2018_present.R data/mex_landings/raw/CONAPESCA/*.xlsx
 		cd $(<D);Rscript $(<F)
 
 # Landings from Stuart
