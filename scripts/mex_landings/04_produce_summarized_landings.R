@@ -19,7 +19,7 @@ pacman::p_load(
 )
 
 # Load data --------------------------------------------------------------------
-landings <- readRDS(here("data", "mex_landings", "clean", "mex_landings_2000_2022.rds")) %>% 
+landings <- readRDS(here("data", "mex_landings", "clean", "mex_landings_2000_present.rds")) %>% 
   filter(!acuaculture_production == "SÍ" | is.na(acuaculture_production))
 
 ## PROCESSING ##################################################################
