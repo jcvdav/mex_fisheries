@@ -30,7 +30,8 @@ monthly_by_vessel <- landings %>%
   group_by(year, month, eu_rnpa, vessel_rnpa, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
             live_weight = sum(live_weight, na.rm = T),
-            value = sum(value, na.rm = T)) %>% 
+            value = sum(value, na.rm = T),
+            .groups = "drop") %>% 
   ungroup()
 
 # Process annual by vessel -----------------------------------------------------
@@ -38,7 +39,8 @@ annual_by_vessel <- monthly_by_vessel %>%
   group_by(year, eu_rnpa, vessel_rnpa, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
             live_weight = sum(live_weight, na.rm = T),
-            value = sum(value, na.rm = T)) %>% 
+            value = sum(value, na.rm = T),
+            .groups = "drop") %>% 
   ungroup()
 
 ## BY EU
@@ -47,7 +49,8 @@ monthly_by_eu <- monthly_by_vessel %>%
   group_by(year, month, eu_rnpa, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
             live_weight = sum(live_weight, na.rm = T),
-            value = sum(value, na.rm = T)) %>% 
+            value = sum(value, na.rm = T),
+            .groups = "drop") %>% 
   ungroup()
 
 # Process annual by eu ---------------------------------------------------------
@@ -55,7 +58,8 @@ annual_by_eu <- monthly_by_eu %>%
   group_by(year, eu_rnpa, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
             live_weight = sum(live_weight, na.rm = T),
-            value = sum(value, na.rm = T)) %>% 
+            value = sum(value, na.rm = T),
+            .groups = "drop") %>% 
   ungroup()
 
 ## BY LANDING SITE
@@ -64,7 +68,8 @@ monthly_by_landing_site <- landings %>%
   group_by(year, month, landing_site_key, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
             live_weight = sum(live_weight, na.rm = T),
-            value = sum(value, na.rm = T)) %>% 
+            value = sum(value, na.rm = T),
+            .groups = "drop") %>% 
   ungroup()
 
 # Process annual by landing_site -----------------------------------------------
@@ -72,7 +77,8 @@ annual_by_landing_site <- landings %>%
   group_by(year, landing_site_key, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
             live_weight = sum(live_weight, na.rm = T),
-            value = sum(value, na.rm = T)) %>% 
+            value = sum(value, na.rm = T),
+            .groups = "drop") %>% 
   ungroup()
 
 

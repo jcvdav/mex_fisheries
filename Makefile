@@ -8,7 +8,7 @@
 
 # Main targets
 mex_fisheries_data: mex_landings mex_vms mex_vessel_registry spatial_features mex_turfs
-mex_landings: data/mex_landings/clean/mex_annual_landings_by_vessel.rds data/mex_landings/clean/mex_monthly_landings_by_vessel.rds data/mex_landings/clean/mex_annual_landings_by_eu.rds data/mex_landings/clean/mex_monthly_landings_by_eu.rds
+mex_landings: data/mex_landings/clean/mex_annual_landings_by_vessel.rds data/mex_landings/clean/mex_monthly_landings_by_vessel.rds data/mex_landings/clean/mex_annual_landings_by_eu.rds data/mex_landings/clean/mex_monthly_landings_by_eu.rds data/mex_landings/clean/mex_monthly_landings_by_landing_site.rds data/mex_landings/clean/mex_annual_landings_by_landing_site.rds
 mex_vms: data/mex_vms/bq_pipeline.log
 mex_vessel_registry: data/mex_vessel_registry/upload.log
 mex_turfs: data/concesiones/processed/all_spp_permit_and_concessions_polygons.gpkg
