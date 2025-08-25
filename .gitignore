@@ -19,10 +19,12 @@ data/maximum_daily_liters.csv
 
 # Mex lanmdings data
 !data/mex_landings/raw/**/
-!data/mex_landings/clean/mex_annual_landings_by_eu.rds
+!data/mex_landings/clean/mex_monthly_landings_by_vessel.rds
 !data/mex_landings/clean/mex_annual_landings_by_vessel.rds
 !data/mex_landings/clean/mex_monthly_landings_by_eu.rds
-!data/mex_landings/clean/mex_monthly_landings_by_vessel.rds
+!data/mex_landings/clean/mex_annual_landings_by_eu.rds
+!data/mex_landings/clean/mex_monthly_landings_by_landing_site.rds
+!data/mex_landings/clean/mex_annual_landings_by_landing_site.rds
 !data/mex_landings/clean/mex_landings_2000_present.rds
 !data/mex_landings/clean/mex_conapesca_apertura_2018_present.rds
 
