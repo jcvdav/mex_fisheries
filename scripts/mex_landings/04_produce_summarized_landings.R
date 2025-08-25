@@ -24,6 +24,7 @@ landings <- readRDS(here("data", "mex_landings", "clean", "mex_landings_2000_pre
 
 ## PROCESSING ##################################################################
 
+## BY VESSEL
 # Process monthly by vessel ----------------------------------------------------
 monthly_by_vessel <- landings %>% 
   group_by(year, month, eu_rnpa, vessel_rnpa, main_species_group) %>% 
@@ -40,6 +41,7 @@ annual_by_vessel <- monthly_by_vessel %>%
             value = sum(value, na.rm = T)) %>% 
   ungroup()
 
+## BY EU
 # Process monthly by eu --------------------------------------------------------
 monthly_by_eu <- monthly_by_vessel %>% 
   group_by(year, month, eu_rnpa, main_species_group) %>% 
@@ -51,6 +53,23 @@ monthly_by_eu <- monthly_by_vessel %>%
 # Process annual by eu ---------------------------------------------------------
 annual_by_eu <- monthly_by_eu %>% 
   group_by(year, eu_rnpa, main_species_group) %>% 
+  summarize(landed_weight = sum(landed_weight, na.rm = T),
+            live_weight = sum(live_weight, na.rm = T),
+            value = sum(value, na.rm = T)) %>% 
+  ungroup()
+
+## BY LANDING SITE
+# Process monthly by landing_site ----------------------------------------------
+monthly_by_landing_site <- landings %>% 
+  group_by(year, month, landing_site_key, main_species_group) %>% 
+  summarize(landed_weight = sum(landed_weight, na.rm = T),
+            live_weight = sum(live_weight, na.rm = T),
+            value = sum(value, na.rm = T)) %>% 
+  ungroup()
+
+# Process annual by landing_site -----------------------------------------------
+annual_by_landing_site <- landings %>% 
+  group_by(year, landing_site_key, main_species_group) %>% 
   summarize(landed_weight = sum(landed_weight, na.rm = T),
             live_weight = sum(live_weight, na.rm = T),
             value = sum(value, na.rm = T)) %>% 
@@ -74,4 +93,12 @@ saveRDS(object = monthly_by_eu,
 # Export annual by eu ---------------------------------------------------------
 saveRDS(object = annual_by_eu,
         file = here("data", "mex_landings", "clean", "mex_annual_landings_by_eu.rds"))
+
+# Export monthly by landing site -----------------------------------------------
+saveRDS(object = monthly_by_landing_site,
+        file = here("data", "mex_landings", "clean", "mex_monthly_landings_by_landing_site.rds"))
+
+# Export annual by landing site ------------------------------------------------
+saveRDS(object = annual_by_landing_site,
+        file = here("data", "mex_landings", "clean", "mex_annual_landings_by_landing_site.rds"))
 
