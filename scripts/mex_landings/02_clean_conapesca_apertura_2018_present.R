@@ -90,6 +90,7 @@ landings_clean <- landings %>%
     landing_site,
     eu_rnpa,
     economic_unit,
+    receipt_date,
     origin,
     fishing_site_name,
     n_vessels,

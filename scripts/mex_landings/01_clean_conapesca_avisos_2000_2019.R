@@ -36,7 +36,7 @@ my_read <- function(path){
                       "fishing_site_name", "n_vessels",
                       "month_cut", "year_cut",
                       "period_start", "period_end",
-                      "period_length", "period_effective_dates",
+                      "period_length", "period_effective_days",
                       "fishing_zone_type", "acuaculture_production",
                       "permit_number", "permit_issue_date",
                       "permit_expiration_date", "main_species_group",
