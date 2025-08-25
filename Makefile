@@ -19,7 +19,7 @@ dag: workflow.png
 
 # SUMMARIZING ------------------------------------------------------------------
 # Create monthly and annual panels by vessel and economic unit
-data/mex_landings/clean/mex_annual_landings_by_vessel.rds data/mex_landings/clean/mex_monthly_landings_by_vessel.rds data/mex_landings/clean/mex_annual_landings_by_eu.rds data/mex_landings/clean/mex_monthly_landings_by_eu.rds: scripts/mex_landings/04_produce_summarized_landings.R data/mex_landings/clean/mex_landings_2000_present.rds
+data/mex_landings/clean/mex_annual_landings_by_vessel.rds data/mex_landings/clean/mex_monthly_landings_by_vessel.rds data/mex_landings/clean/mex_annual_landings_by_eu.rds data/mex_landings/clean/mex_monthly_landings_by_eu.rds data/mex_landings/clean/mex_monthly_landings_by_landing_site.rds data/mex_landings/clean/mex_annual_landings_by_landing_site.rds: scripts/mex_landings/04_produce_summarized_landings.R data/mex_landings/clean/mex_landings_2000_present.rds
 		cd $(<D);Rscript $(<F)
 
 # COMBINING --------------------------------------------------------------------

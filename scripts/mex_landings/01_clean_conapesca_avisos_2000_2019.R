@@ -66,8 +66,8 @@ files <- list.files(path = here("data", "mex_landings", "raw", "CONAPESCA_Avisos
 # Load data and apply filters --------------------------------------------------
 dt <- map_dfr(files, my_read) %>% 
   as_tibble() %>% 
-  mutate(eu_rnpa = fix_rnpa(rnpa = eu_rnpa, length = 10),
-         vessel_rnpa = fix_rnpa(rnpa = vessel_rnpa),
+  mutate(eu_rnpa = fix_rnpa(rnpa = eu_rnpa, length = 10),                       # Make sure EUs are 10 digits long
+         vessel_rnpa = fix_rnpa(rnpa = vessel_rnpa),                            # and vessels are 8 digits long
          acuaculture_production = case_when(acuaculture_production == "" ~ NA_character_,
                                             T ~ acuaculture_production))
 
